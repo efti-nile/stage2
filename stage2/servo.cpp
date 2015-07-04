@@ -3,34 +3,37 @@
 // Pin Table
 const struct pin pinTab[NUM_SERVO] = {
 	{&DDRA, &PORTA, &PINA, 0},
+	{&DDRA, &PORTA, &PINA, 1},
 	{&DDRA, &PORTA, &PINA, 2},
-	{&DDRA, &PORTA, &PINA, 4},
-	{&DDRA, &PORTA, &PINA, 6},
-	{&DDRC, &PORTC, &PINC, 2},
+	{&DDRC, &PORTC, &PINC, 0},
+	{&DDRC, &PORTC, &PINC, 1},
+	{&DDRC, &PORTC, &PINC, 2}
 };
 
 // Between any 2 duties must be at least 10 LBM!
 const u16 pwmDutyTab[NUM_SERVO] = {
-	302,
-	295,
-	278,
-	128,
-	128
+	600,
+	500,
+	400,
+	300,
+	200,
+	100
 };
 
-struct ActiveChann_TypeDef ActiveChann = {{0, 0, 0, 0, 0}, 0, NUM_SERVO + 1};
+struct ActiveChann_TypeDef ActiveChann = {{0, 0, 0, 0, 0, 0}, 0, NUM_SERVO + 1};
 	
 void Servo(enum ServoName s, enum ServoAction a){
-	switch(a){
+/*	switch(a){
 	case Init:
 		// Set proper pins as outputs
 		*pinTab[(u8)s].DDR |= 1 << pinTab[(u8)s].p;
-		PinOut((u8)s, LOW);
+		// Set initial output value
+		*pinTab[(u8)s].PORT |= 1 << pinTab[(u8)s].p;
 	    break;
 	case EnablePWM:
-		PWM_AddChannel((u8)s);	
+		PWM_AddChannel((u8)s);
 	    break;
-	}
+	}*/
 }
 
 void PWM_AddChannel(u8 channel){
@@ -54,10 +57,11 @@ void PWM_AddChannel(u8 channel){
 	++ActiveChann.Num;
 }
 
-void PinOut(u8 channel, u8 out){
+u8 PinOut(u8 channel, u8 out){
 	if(out){
 		*pinTab[channel].PORT |= 1 << pinTab[channel].p;
 	}else{
 		*pinTab[channel].PORT &= ~(1 << pinTab[channel].p);
 	}
+	return 0;
 }

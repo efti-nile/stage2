@@ -7,7 +7,7 @@
 #include <avr/interrupt.h>
 
 // periphery inside MCU
-#include "USART.h"
+// #include "USART.h"
 #include "servo.h"
 
 // Start Key

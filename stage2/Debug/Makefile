@@ -37,6 +37,7 @@ SUBDIRS :=
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS +=  \
+../servo.cpp \
 ../stage2.cpp
 
 
@@ -47,15 +48,19 @@ ASM_SRCS +=
 
 
 OBJS +=  \
+servo.o \
 stage2.o
 
 OBJS_AS_ARGS +=  \
+servo.o \
 stage2.o
 
 C_DEPS +=  \
+servo.d \
 stage2.d
 
 C_DEPS_AS_ARGS +=  \
+servo.d \
 stage2.d
 
 OUTPUT_FILE_PATH +=stage2.elf
@@ -72,6 +77,8 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
 
 
 

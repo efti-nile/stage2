@@ -7,7 +7,7 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
-#define NUM_SERVO 5
+#define NUM_SERVO 6
 #define SERVO_PWM_PERIOD_US 1300
 
 #define HIGH 1
@@ -22,11 +22,12 @@ struct pin{
 };
 
 enum ServoName{
-	LateralBoosterServo = 0,
-	CanSatServo,
-	ParachuteServo,
-	ReservedServo1,
-	ReservedServo2
+	CanSat1 = 0,
+	CanSat2,
+	CanSat3,
+	Parachute,
+	CanSatsHatchLock,
+	ParachuteHatchLock
 };
 
 enum ServoAction{
@@ -46,5 +47,5 @@ extern struct ActiveChann_TypeDef ActiveChann;
 
 void Servo(enum ServoName s, enum ServoAction a);
 void PWM_AddChannel(u8 channel);
-void PinOut(u8 channel, u8 out);
+u8 PinOut(u8 channel, u8 out);
 #endif

@@ -134,6 +134,18 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="macro.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="main.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="servo.cpp">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="servo.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="stage2.cpp">
       <SubType>compile</SubType>
     </Compile>
