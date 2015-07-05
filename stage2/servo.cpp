@@ -23,17 +23,16 @@ const u16 pwmDutyTab[NUM_SERVO] = {
 struct ActiveChann_TypeDef ActiveChann = {{0, 0, 0, 0, 0, 0}, 0, NUM_SERVO + 1};
 	
 void Servo(enum ServoName s, enum ServoAction a){
-/*	switch(a){
+	switch(a){
 	case Init:
 		// Set proper pins as outputs
 		*pinTab[(u8)s].DDR |= 1 << pinTab[(u8)s].p;
-		// Set initial output value
-		*pinTab[(u8)s].PORT |= 1 << pinTab[(u8)s].p;
-	    break;
+		PinOut((u8)s, LOW);
+		break;
 	case EnablePWM:
 		PWM_AddChannel((u8)s);
 	    break;
-	}*/
+	}
 }
 
 void PWM_AddChannel(u8 channel){
@@ -57,11 +56,10 @@ void PWM_AddChannel(u8 channel){
 	++ActiveChann.Num;
 }
 
-u8 PinOut(u8 channel, u8 out){
+void PinOut(u8 channel, u8 out){
 	if(out){
 		*pinTab[channel].PORT |= 1 << pinTab[channel].p;
 	}else{
 		*pinTab[channel].PORT &= ~(1 << pinTab[channel].p);
 	}
-	return 0;
 }

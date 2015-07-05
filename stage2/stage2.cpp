@@ -37,21 +37,42 @@ ISR(TIMER1_OVF_vect)
 
 int main(void)
 {
-    /*Servo(CanSat1, Init);
+	SP = 0xFFF;
+	
+    Servo(CanSat1, Init);
     Servo(CanSat2, Init);
     Servo(CanSat3, Init);
     Servo(Parachute, Init);
     Servo(CanSatsHatchLock, Init);
-    Servo(ParachuteHatchLock, Init);*/
+    Servo(ParachuteHatchLock, Init);
 	
-	ATmega8_16bitTimer();
-	
-	/*Servo(CanSat1, EnablePWM);
+
+	Servo(CanSat1, EnablePWM);
+
 	Servo(CanSat2, EnablePWM);
 	Servo(CanSat3, EnablePWM);
 	Servo(Parachute, EnablePWM);
 	Servo(CanSatsHatchLock, EnablePWM);
-	Servo(ParachuteHatchLock, EnablePWM);*/
-    
+	Servo(ParachuteHatchLock, EnablePWM);
+	
+		ATmega8_16bitTimer();
+	sei();
+	
 	while(1);
+	
+
+	
+	while(1);
+    
+	DDRA |= 0x7;
+	DDRC |= 0x7;
+	
+	while(1){
+		_delay_ms(1000);
+		PORTA = 0x07;
+		PORTC = 0x07;
+		_delay_ms(1000);
+		PORTA = 0x0;
+		PORTC = 0x0;
+	}
 }

@@ -47,5 +47,5 @@ extern struct ActiveChann_TypeDef ActiveChann;
 
 void Servo(enum ServoName s, enum ServoAction a);
 void PWM_AddChannel(u8 channel);
-u8 PinOut(u8 channel, u8 out);
+void PinOut(u8 channel, u8 out);
 #endif
