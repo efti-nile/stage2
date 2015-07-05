@@ -37,6 +37,17 @@
 #define CANSAT_DELAY 1000
 #define PARACHUTE_DELAY 1000
 
+// Buttons pins
+#define BUTTONS_INIT {DDRE &= ~0xE0; DDRG &= ~0x0F;} 
+
+#define CS1_IS_HIGH  (PINE & 1 << 5)
+#define CS2_IS_HIGH  (PINE & 1 << 6)
+#define CS3_IS_HIGH  (PINE & 1 << 7)
+#define P_IS_HIGH    (PING & 1 << 0)
+#define CSHL_IS_HIGH (PING & 1 << 1)
+#define PHL_IS_HIGH  (PING & 1 << 2)
+#define CSO_IS_HIGH  (PING & 1 << 3)
+
 // Local protoypes
 ISR(USART_RXC_vect);
 

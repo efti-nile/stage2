@@ -8,10 +8,14 @@ const struct pin pinTab[NUM_SERVO] = {
 	{&DDRC, &PORTC, &PINC, 0},
 	{&DDRC, &PORTC, &PINC, 1},
 	{&DDRC, &PORTC, &PINC, 2}
+	{&DDRA, &PORTA, &PINA, 3},
+	{&DDRA, &PORTA, &PINA, 4}
 };
 
 // Between any 2 duties must be at least 10 LBM!
 const u16 pwmDutyTab[NUM_SERVO] = {
+	800,
+	700,
 	600,
 	500,
 	400,
@@ -20,7 +24,7 @@ const u16 pwmDutyTab[NUM_SERVO] = {
 	100
 };
 
-struct ActiveChann_TypeDef ActiveChann = {{0, 0, 0, 0, 0, 0}, 0, NUM_SERVO + 1};
+struct ActiveChann_TypeDef ActiveChann = {{0, 0, 0, 0, 0, 0, 0, 0}, 0, NUM_SERVO + 1};
 	
 void Servo(enum ServoName s, enum ServoAction a){
 	switch(a){
