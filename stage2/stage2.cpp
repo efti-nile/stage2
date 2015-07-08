@@ -1,6 +1,7 @@
 #include "main.h"
 
 volatile u16 calvar = SERVO_PWM_PERIOD_US / 2; // This var used for actuators calibration
+volatile u8 pwmCanBeChanged = 0;
 
 void ATmega8_16bitTimer(void)
 {
@@ -16,43 +17,45 @@ ISR(TIMER1_OVF_vect)
 {
 	if( ActiveChann.Num > 0 ){
 		if( ActiveChann.State == NUM_SERVO + 1 ){
-			for( u8 i = 0; i < ActiveChann.Num; ++i ){
-				PinOut(ActiveChann.Tab[i], HIGH);
-			}
-			ActiveChann.State = 0;
-			TCNT1 = 0xFFFF - pwmDutyTab[ActiveChann.Tab[0]];
+				pwmCanBeChanged = 0;
+				for( u8 i = 0; i < ActiveChann.Num; ++i ){
+					PinOut(ActiveChann.Tab[i], HIGH);
+				}
+				ActiveChann.State = 0;
+				TCNT1 = 0xFFFF - pwmDutyTab[ActiveChann.Tab[0]];
 			}else{
-			PinOut(ActiveChann.Tab[ActiveChann.State], LOW);
-			
-			if( ActiveChann.State < ActiveChann.Num - 1 ){
-				TCNT1 = 0xFFFF - ( pwmDutyTab[ActiveChann.Tab[ActiveChann.State+1]] - pwmDutyTab[ActiveChann.Tab[ActiveChann.State]] );
-				++ActiveChann.State;
-				}else{
-				TCNT1 = 0xFFFF - ( SERVO_PWM_PERIOD_US - pwmDutyTab[ActiveChann.Tab[ActiveChann.State]] );
-				ActiveChann.State = NUM_SERVO + 1;
+				PinOut(ActiveChann.Tab[ActiveChann.State], LOW);
+				
+				if( ActiveChann.State < ActiveChann.Num - 1 ){
+					TCNT1 = 0xFFFF - ( pwmDutyTab[ActiveChann.Tab[ActiveChann.State+1]] - pwmDutyTab[ActiveChann.Tab[ActiveChann.State]] );
+					++ActiveChann.State;
+					}else{
+					TCNT1 = 0xFFFF - ( SERVO_PWM_PERIOD_US - pwmDutyTab[ActiveChann.Tab[ActiveChann.State]] );
+					ActiveChann.State = NUM_SERVO + 1;
+					pwmCanBeChanged = 1;
+				}
 			}
-		}
 		}else{
-		TCNT1 = 0xFFFF - SERVO_PWM_PERIOD_US;
-	}
+			TCNT1 = 0xFFFF - SERVO_PWM_PERIOD_US;
+		}
 }
 
-u8 polling(u8 *reg, u8 bitno){
+u8 polling(volatile u8 *reg, u8 bitno){
 	u16 cntr = 0, dcntr;
 	while(*reg & 1 << bitno){
-		if(cntr++ > DEBOUNC_DELAY){
+		if(cntr++ > DEBOUNCE_DELAY){
 			// Wait until the button released
 			dcntr = 0;
 			while(dcntr++ < DOUBLECLICK_DELAY){
 				cntr = 0;
 				while(!(*reg & 1 << bitno)){
-					if(cntr++ > DEBOUNC_DELAY){
+					if(cntr++ > DEBOUNCE_DELAY){
 						// Wait for the second click
 						dcntr = 0;
 						while(dcntr++ < DOUBLECLICK_DELAY){
 							cntr = 0;
 							while(*reg & 1 << bitno){
-								if(cntr++ > DEBOUNC_DELAY){
+								if(cntr++ > DEBOUNCE_DELAY){
 									// So the second click happened
 									return 2;
 								}
@@ -77,6 +80,17 @@ int main(void)
 {
 	SP = 0xFFF;
 	
+	Servo(CanSat1, Init);
+	Servo(CanSat1, EnablePWM);
+	ATmega8_16bitTimer();
+	sei();
+	while(1){
+		for(calvar = 18000; calvar < 19000; calvar += 50){
+					_delay_ms(500);
+					Servo_ChangeDuty(CanSat1,calvar);
+		}
+	}
+		
 	/*
 	// This loop used for actuators calibration
 	// acn - number of an actuator to calibrate

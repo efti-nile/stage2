@@ -48,6 +48,31 @@
 #define PHL_IS_HIGH  (PING & 1 << 2)
 #define CSO_IS_HIGH  (PING & 1 << 3)
 
+#define DEBOUNCE_DELAY 10
+#define DOUBLECLICK_DELAY 500
+
+#define CS1_CLOSED 850
+#define CS1_OPENED 870
+
+#define CS2_CLOSED 890
+#define CS2_OPENED 910
+
+#define CS3_CLOSED 930
+#define CS3_OPENED 950
+
+#define P_CLOSED 970
+#define P_OPENED 990
+
+#define CSHL_CLOSED 1010
+#define CSHL_OPENED 1030
+
+#define PHL_CLOSED 1050
+#define PHL_OPENED 1070
+
+#define CSO_CLOSED 1090
+#define CSO_OPENED 1110
+
+
 // Local protoypes
 ISR(USART_RXC_vect);
 

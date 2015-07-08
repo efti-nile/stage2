@@ -7,13 +7,14 @@ const struct pin pinTab[NUM_SERVO] = {
 	{&DDRA, &PORTA, &PINA, 2},
 	{&DDRC, &PORTC, &PINC, 0},
 	{&DDRC, &PORTC, &PINC, 1},
-	{&DDRC, &PORTC, &PINC, 2}
+	{&DDRC, &PORTC, &PINC, 2},
 	{&DDRA, &PORTA, &PINA, 3},
 	{&DDRA, &PORTA, &PINA, 4}
 };
 
 // Between any 2 duties must be at least 10 LBM!
-const u16 pwmDutyTab[NUM_SERVO] = {
+// In C-SPACE 2015 PCB PWM channels are inverted!
+u16 pwmDutyTab[NUM_SERVO] = {
 	800,
 	700,
 	600,
@@ -58,6 +59,28 @@ void PWM_AddChannel(u8 channel){
 	asm("sei\n");
 	
 	++ActiveChann.Num;
+}
+
+u8 Servo_ChangeDuty(enum ServoName s, u16 newDuty){
+	u8 i;
+	if(newDuty < 10 || newDuty > SERVO_PWM_PERIOD_US - 10){
+		return 1;
+	};
+	while(!pwmCanBeChanged);
+	asm("cli\n");
+	for(i = 0; i < ActiveChann.Num; i++){
+		if(ActiveChann.Tab[i] == (u8)s){
+			for(i++; i < ActiveChann.Num; i++){
+				ActiveChann.Tab[i-1] = ActiveChann.Tab[i];
+			}
+			ActiveChann.Num--;
+			break;
+		}
+	}
+	asm("sei\n");
+	pwmDutyTab[(u8)s] = newDuty;
+	PWM_AddChannel((u8)s);
+	return 0;
 }
 
 void PinOut(u8 channel, u8 out){
