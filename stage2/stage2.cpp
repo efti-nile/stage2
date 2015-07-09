@@ -57,7 +57,17 @@ u8 polling(volatile u8 *reg, u8 bitno){
 							while(*reg & 1 << bitno){
 								if(cntr++ > DEBOUNCE_DELAY){
 									// So the second click happened
-									return 2;
+									dcntr = 0;
+									while(dcntr++ < DOUBLECLICK_DELAY){
+										cntr = 0;
+										while(!(*reg & 1 << bitno)){
+											if(cntr++ > DEBOUNCE_DELAY){
+												return 2;
+											}
+											_delay_ms(1);
+										}
+										_delay_ms(1);
+									}
 								}
 								_delay_ms(1);
 							}
@@ -85,10 +95,17 @@ int main(void)
 	ATmega8_16bitTimer();
 	sei();
 	while(1){
-		for(calvar = 18000; calvar < 19000; calvar += 50){
-					_delay_ms(500);
-					Servo_ChangeDuty(CanSat1,calvar);
+		u8 retval = polling(&PINB, 1);
+		if(retval == 1){
+			Servo_ChangeDuty(CanSat1, 18000);
+		}else
+		if(retval == 2){
+			Servo_ChangeDuty(CanSat1, 19000);
 		}
+		/*for(calvar = 17500; calvar < 19500; calvar += 50){
+					_delay_ms(100);
+					Servo_ChangeDuty(CanSat1,calvar);
+		}*/
 	}
 		
 	/*

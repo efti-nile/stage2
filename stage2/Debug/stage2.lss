@@ -3,29 +3,29 @@ stage2.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .data         00000054  00800100  0000044e  000004e2  2**0
+  0 .data         00000052  00800100  000005b8  0000064c  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  1 .text         0000044e  00000000  00000000  00000094  2**1
+  1 .text         000005b8  00000000  00000000  00000094  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .bss          00000001  00800154  00800154  00000536  2**0
+  2 .bss          00000001  00800152  00800152  0000069e  2**0
                   ALLOC
-  3 .comment      00000030  00000000  00000000  00000536  2**0
+  3 .comment      00000030  00000000  00000000  0000069e  2**0
                   CONTENTS, READONLY
-  4 .debug_aranges 00000070  00000000  00000000  00000566  2**0
+  4 .debug_aranges 00000070  00000000  00000000  000006ce  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_info   000007e5  00000000  00000000  000005d6  2**0
+  5 .debug_info   00000882  00000000  00000000  0000073e  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_abbrev 0000040d  00000000  00000000  00000dbb  2**0
+  6 .debug_abbrev 00000406  00000000  00000000  00000fc0  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_line   00000477  00000000  00000000  000011c8  2**0
+  7 .debug_line   000004cd  00000000  00000000  000013c6  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_frame  00000114  00000000  00000000  00001640  2**2
+  8 .debug_frame  00000120  00000000  00000000  00001894  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    00000384  00000000  00000000  00001754  2**0
+  9 .debug_str    000003a9  00000000  00000000  000019b4  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_loc    000006db  00000000  00000000  00001ad8  2**0
+ 10 .debug_loc    0000083f  00000000  00000000  00001d5d  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_ranges 00000050  00000000  00000000  000021b3  2**0
+ 11 .debug_ranges 00000050  00000000  00000000  0000259c  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -114,20 +114,20 @@ Disassembly of section .text:
   98:	11 e0       	ldi	r17, 0x01	; 1
   9a:	a0 e0       	ldi	r26, 0x00	; 0
   9c:	b1 e0       	ldi	r27, 0x01	; 1
-  9e:	ee e4       	ldi	r30, 0x4E	; 78
-  a0:	f4 e0       	ldi	r31, 0x04	; 4
+  9e:	e8 eb       	ldi	r30, 0xB8	; 184
+  a0:	f5 e0       	ldi	r31, 0x05	; 5
   a2:	00 e0       	ldi	r16, 0x00	; 0
   a4:	0b bf       	out	0x3b, r16	; 59
   a6:	02 c0       	rjmp	.+4      	; 0xac <__do_copy_data+0x14>
   a8:	07 90       	elpm	r0, Z+
   aa:	0d 92       	st	X+, r0
-  ac:	a4 35       	cpi	r26, 0x54	; 84
+  ac:	a2 35       	cpi	r26, 0x52	; 82
   ae:	b1 07       	cpc	r27, r17
   b0:	d9 f7       	brne	.-10     	; 0xa8 <__do_copy_data+0x10>
 
 000000b2 <__do_clear_bss>:
   b2:	21 e0       	ldi	r18, 0x01	; 1
-  b4:	a4 e5       	ldi	r26, 0x54	; 84
+  b4:	a2 e5       	ldi	r26, 0x52	; 82
   b6:	b1 e0       	ldi	r27, 0x01	; 1
   b8:	01 c0       	rjmp	.+2      	; 0xbc <.do_clear_bss_start>
 
@@ -135,11 +135,11 @@ Disassembly of section .text:
   ba:	1d 92       	st	X+, r1
 
 000000bc <.do_clear_bss_start>:
-  bc:	a5 35       	cpi	r26, 0x55	; 85
+  bc:	a3 35       	cpi	r26, 0x53	; 83
   be:	b2 07       	cpc	r27, r18
   c0:	e1 f7       	brne	.-8      	; 0xba <.do_clear_bss_loop>
-  c2:	8a d1       	rcall	.+788    	; 0x3d8 <main>
-  c4:	c2 c1       	rjmp	.+900    	; 0x44a <_exit>
+  c2:	5a d2       	rcall	.+1204   	; 0x578 <main>
+  c4:	77 c2       	rjmp	.+1262   	; 0x5b4 <_exit>
 
 000000c6 <__bad_interrupt>:
   c6:	9c cf       	rjmp	.-200    	; 0x0 <__vectors>
@@ -276,7 +276,7 @@ u8 Servo_ChangeDuty(enum ServoName s, u16 newDuty){
 		return 1;
 	};
 	while(!pwmCanBeChanged);
- 164:	90 91 54 01 	lds	r25, 0x0154
+ 164:	90 91 52 01 	lds	r25, 0x0152
  168:	99 23       	and	r25, r25
  16a:	e1 f3       	breq	.-8      	; 0x164 <_Z16Servo_ChangeDuty9ServoNamet+0xc>
 	asm("cli\n");
@@ -389,7 +389,7 @@ void PinOut(u8 channel, u8 out){
  1da:	89 9f       	mul	r24, r25
  1dc:	d0 01       	movw	r26, r0
  1de:	11 24       	eor	r1, r1
- 1e0:	a4 5e       	subi	r26, 0xE4	; 228
+ 1e0:	a6 5e       	subi	r26, 0xE6	; 230
  1e2:	be 4f       	sbci	r27, 0xFE	; 254
  1e4:	12 96       	adiw	r26, 0x02	; 2
  1e6:	ed 91       	ld	r30, X+
@@ -415,7 +415,7 @@ void PinOut(u8 channel, u8 out){
  20a:	89 9f       	mul	r24, r25
  20c:	d0 01       	movw	r26, r0
  20e:	11 24       	eor	r1, r1
- 210:	a4 5e       	subi	r26, 0xE4	; 228
+ 210:	a6 5e       	subi	r26, 0xE6	; 230
  212:	be 4f       	sbci	r27, 0xFE	; 254
  214:	12 96       	adiw	r26, 0x02	; 2
  216:	ed 91       	ld	r30, X+
@@ -456,7 +456,7 @@ void Servo(enum ServoName s, enum ServoAction a){
  246:	89 9f       	mul	r24, r25
  248:	d0 01       	movw	r26, r0
  24a:	11 24       	eor	r1, r1
- 24c:	a4 5e       	subi	r26, 0xE4	; 228
+ 24c:	a6 5e       	subi	r26, 0xE6	; 230
  24e:	be 4f       	sbci	r27, 0xFE	; 254
  250:	ed 91       	ld	r30, X+
  252:	fc 91       	ld	r31, X
@@ -485,24 +485,33 @@ void Servo(enum ServoName s, enum ServoAction a){
  278:	08 95       	ret
 
 0000027a <_Z18ATmega8_16bitTimerv>:
-			}
-		}
-		_delay_ms(1);
-	}
-	return 0;
-}
+volatile u16 calvar = SERVO_PWM_PERIOD_US / 2; // This var used for actuators calibration
+volatile u8 pwmCanBeChanged = 0;
+
+void ATmega8_16bitTimer(void)
+{
+	TCNT1 = 0xFFFF - SERVO_PWM_PERIOD_US;
  27a:	8f ed       	ldi	r24, 0xDF	; 223
  27c:	91 eb       	ldi	r25, 0xB1	; 177
  27e:	9d bd       	out	0x2d, r25	; 45
  280:	8c bd       	out	0x2c, r24	; 44
+	// Set timer clock to F_CPU / 8
+	TCCR1B = 0x02;
  282:	82 e0       	ldi	r24, 0x02	; 2
  284:	8e bd       	out	0x2e, r24	; 46
+	// Enable Overflow Interrupt
+	TIMSK |= 1 << TOIE1;
  286:	87 b7       	in	r24, 0x37	; 55
  288:	84 60       	ori	r24, 0x04	; 4
  28a:	87 bf       	out	0x37, r24	; 55
  28c:	08 95       	ret
 
 0000028e <__vector_14>:
+}
+
+// ISR to deal with software PWM
+ISR(TIMER1_OVF_vect)
+{
  28e:	1f 92       	push	r1
  290:	0f 92       	push	r0
  292:	0f b6       	in	r0, 0x3f	; 63
@@ -525,19 +534,24 @@ void Servo(enum ServoName s, enum ServoAction a){
  2b4:	df 93       	push	r29
  2b6:	ef 93       	push	r30
  2b8:	ff 93       	push	r31
+	if( ActiveChann.Num > 0 ){
  2ba:	80 91 08 01 	lds	r24, 0x0108
  2be:	88 23       	and	r24, r24
  2c0:	09 f4       	brne	.+2      	; 0x2c4 <__vector_14+0x36>
  2c2:	70 c0       	rjmp	.+224    	; 0x3a4 <__vector_14+0x116>
+		if( ActiveChann.State == NUM_SERVO + 1 ){
  2c4:	e0 91 09 01 	lds	r30, 0x0109
  2c8:	e9 30       	cpi	r30, 0x09	; 9
  2ca:	11 f5       	brne	.+68     	; 0x310 <__vector_14+0x82>
- 2cc:	10 92 54 01 	sts	0x0154, r1
+				pwmCanBeChanged = 0;
+ 2cc:	10 92 52 01 	sts	0x0152, r1
+				for( u8 i = 0; i < ActiveChann.Num; ++i ){
  2d0:	88 23       	and	r24, r24
  2d2:	71 f0       	breq	.+28     	; 0x2f0 <__vector_14+0x62>
  2d4:	10 e0       	ldi	r17, 0x00	; 0
  2d6:	c8 e0       	ldi	r28, 0x08	; 8
  2d8:	d1 e0       	ldi	r29, 0x01	; 1
+					PinOut(ActiveChann.Tab[i], HIGH);
  2da:	e1 2f       	mov	r30, r17
  2dc:	f0 e0       	ldi	r31, 0x00	; 0
  2de:	e0 50       	subi	r30, 0x00	; 0
@@ -545,11 +559,21 @@ void Servo(enum ServoName s, enum ServoAction a){
  2e2:	61 e0       	ldi	r22, 0x01	; 1
  2e4:	80 81       	ld	r24, Z
  2e6:	76 df       	rcall	.-276    	; 0x1d4 <_Z6PinOuthh>
+ISR(TIMER1_OVF_vect)
+{
+	if( ActiveChann.Num > 0 ){
+		if( ActiveChann.State == NUM_SERVO + 1 ){
+				pwmCanBeChanged = 0;
+				for( u8 i = 0; i < ActiveChann.Num; ++i ){
  2e8:	1f 5f       	subi	r17, 0xFF	; 255
  2ea:	88 81       	ld	r24, Y
  2ec:	18 17       	cp	r17, r24
  2ee:	a8 f3       	brcs	.-22     	; 0x2da <__vector_14+0x4c>
+					PinOut(ActiveChann.Tab[i], HIGH);
+				}
+				ActiveChann.State = 0;
  2f0:	10 92 09 01 	sts	0x0109, r1
+				TCNT1 = 0xFFFF - pwmDutyTab[ActiveChann.Tab[0]];
  2f4:	e0 91 00 01 	lds	r30, 0x0100
  2f8:	f0 e0       	ldi	r31, 0x00	; 0
  2fa:	ee 0f       	add	r30, r30
@@ -563,12 +587,16 @@ void Servo(enum ServoName s, enum ServoAction a){
  30a:	9d bd       	out	0x2d, r25	; 45
  30c:	8c bd       	out	0x2c, r24	; 44
  30e:	4e c0       	rjmp	.+156    	; 0x3ac <__vector_14+0x11e>
+			}else{
+				PinOut(ActiveChann.Tab[ActiveChann.State], LOW);
  310:	f0 e0       	ldi	r31, 0x00	; 0
  312:	e0 50       	subi	r30, 0x00	; 0
  314:	ff 4f       	sbci	r31, 0xFF	; 255
  316:	60 e0       	ldi	r22, 0x00	; 0
  318:	80 81       	ld	r24, Z
  31a:	5c df       	rcall	.-328    	; 0x1d4 <_Z6PinOuthh>
+				
+				if( ActiveChann.State < ActiveChann.Num - 1 ){
  31c:	80 91 09 01 	lds	r24, 0x0109
  320:	90 e0       	ldi	r25, 0x00	; 0
  322:	20 91 08 01 	lds	r18, 0x0108
@@ -578,6 +606,7 @@ void Servo(enum ServoName s, enum ServoAction a){
  32c:	82 17       	cp	r24, r18
  32e:	93 07       	cpc	r25, r19
  330:	fc f4       	brge	.+62     	; 0x370 <__vector_14+0xe2>
+					TCNT1 = 0xFFFF - ( pwmDutyTab[ActiveChann.Tab[ActiveChann.State+1]] - pwmDutyTab[ActiveChann.Tab[ActiveChann.State]] );
  332:	fc 01       	movw	r30, r24
  334:	e0 50       	subi	r30, 0x00	; 0
  336:	ff 4f       	sbci	r31, 0xFF	; 255
@@ -603,12 +632,15 @@ void Servo(enum ServoName s, enum ServoAction a){
  35e:	90 95       	com	r25
  360:	9d bd       	out	0x2d, r25	; 45
  362:	8c bd       	out	0x2c, r24	; 44
+					++ActiveChann.State;
  364:	e9 e0       	ldi	r30, 0x09	; 9
  366:	f1 e0       	ldi	r31, 0x01	; 1
  368:	80 81       	ld	r24, Z
  36a:	8f 5f       	subi	r24, 0xFF	; 255
  36c:	80 83       	st	Z, r24
  36e:	1e c0       	rjmp	.+60     	; 0x3ac <__vector_14+0x11e>
+					}else{
+					TCNT1 = 0xFFFF - ( SERVO_PWM_PERIOD_US - pwmDutyTab[ActiveChann.Tab[ActiveChann.State]] );
  370:	fc 01       	movw	r30, r24
  372:	e0 50       	subi	r30, 0x00	; 0
  374:	ff 4f       	sbci	r31, 0xFF	; 255
@@ -628,15 +660,23 @@ void Servo(enum ServoName s, enum ServoAction a){
  390:	90 95       	com	r25
  392:	9d bd       	out	0x2d, r25	; 45
  394:	8c bd       	out	0x2c, r24	; 44
+					ActiveChann.State = NUM_SERVO + 1;
  396:	89 e0       	ldi	r24, 0x09	; 9
  398:	80 93 09 01 	sts	0x0109, r24
+					pwmCanBeChanged = 1;
  39c:	81 e0       	ldi	r24, 0x01	; 1
- 39e:	80 93 54 01 	sts	0x0154, r24
+ 39e:	80 93 52 01 	sts	0x0152, r24
  3a2:	04 c0       	rjmp	.+8      	; 0x3ac <__vector_14+0x11e>
+				}
+			}
+		}else{
+			TCNT1 = 0xFFFF - SERVO_PWM_PERIOD_US;
  3a4:	8f ed       	ldi	r24, 0xDF	; 223
  3a6:	91 eb       	ldi	r25, 0xB1	; 177
  3a8:	9d bd       	out	0x2d, r25	; 45
  3aa:	8c bd       	out	0x2c, r24	; 44
+		}
+}
  3ac:	ff 91       	pop	r31
  3ae:	ef 91       	pop	r30
  3b0:	df 91       	pop	r29
@@ -660,80 +700,418 @@ void Servo(enum ServoName s, enum ServoAction a){
  3d4:	1f 90       	pop	r1
  3d6:	18 95       	reti
 
-000003d8 <main>:
+000003d8 <_Z7pollingPVhh>:
 
-int main(void)
-{
-	SP = 0xFFF;
- 3d8:	8f ef       	ldi	r24, 0xFF	; 255
- 3da:	9f e0       	ldi	r25, 0x0F	; 15
- 3dc:	9e bf       	out	0x3e, r25	; 62
- 3de:	8d bf       	out	0x3d, r24	; 61
-	
-	Servo(CanSat1, Init);
- 3e0:	60 e0       	ldi	r22, 0x00	; 0
- 3e2:	80 e0       	ldi	r24, 0x00	; 0
- 3e4:	2a df       	rcall	.-428    	; 0x23a <_Z5Servo9ServoName11ServoAction>
-	Servo(CanSat1, EnablePWM);
- 3e6:	61 e0       	ldi	r22, 0x01	; 1
- 3e8:	80 e0       	ldi	r24, 0x00	; 0
- 3ea:	27 df       	rcall	.-434    	; 0x23a <_Z5Servo9ServoName11ServoAction>
-	ATmega8_16bitTimer();
- 3ec:	46 df       	rcall	.-372    	; 0x27a <_Z18ATmega8_16bitTimerv>
-	sei();
- 3ee:	78 94       	sei
-	while(1){
-		for(calvar = 18000; calvar < 19000; calvar += 50){
- 3f0:	c0 e5       	ldi	r28, 0x50	; 80
- 3f2:	d6 e4       	ldi	r29, 0x46	; 70
- 3f4:	d0 93 1b 01 	sts	0x011B, r29
- 3f8:	c0 93 1a 01 	sts	0x011A, r28
- 3fc:	80 91 1a 01 	lds	r24, 0x011A
- 400:	90 91 1b 01 	lds	r25, 0x011B
- 404:	88 33       	cpi	r24, 0x38	; 56
- 406:	9a 44       	sbci	r25, 0x4A	; 74
- 408:	a8 f7       	brcc	.-22     	; 0x3f4 <main+0x1c>
+u8 polling(volatile u8 *reg, u8 bitno){
+ 3d8:	ef 92       	push	r14
+ 3da:	ff 92       	push	r15
+ 3dc:	0f 93       	push	r16
+ 3de:	1f 93       	push	r17
+ 3e0:	cf 93       	push	r28
+ 3e2:	df 93       	push	r29
+ 3e4:	fc 01       	movw	r30, r24
+	u16 cntr = 0, dcntr;
+	while(*reg & 1 << bitno){
+ 3e6:	80 81       	ld	r24, Z
+ 3e8:	90 e0       	ldi	r25, 0x00	; 0
+ 3ea:	06 2e       	mov	r0, r22
+ 3ec:	02 c0       	rjmp	.+4      	; 0x3f2 <_Z7pollingPVhh+0x1a>
+ 3ee:	95 95       	asr	r25
+ 3f0:	87 95       	ror	r24
+ 3f2:	0a 94       	dec	r0
+ 3f4:	e2 f7       	brpl	.-8      	; 0x3ee <_Z7pollingPVhh+0x16>
+ 3f6:	80 ff       	sbrs	r24, 0
+ 3f8:	b3 c0       	rjmp	.+358    	; 0x560 <_Z7pollingPVhh+0x188>
+ 3fa:	81 e0       	ldi	r24, 0x01	; 1
+ 3fc:	90 e0       	ldi	r25, 0x00	; 0
+ 3fe:	9c 01       	movw	r18, r24
+ 400:	02 c0       	rjmp	.+4      	; 0x406 <_Z7pollingPVhh+0x2e>
+ 402:	22 0f       	add	r18, r18
+ 404:	33 1f       	adc	r19, r19
+ 406:	6a 95       	dec	r22
+ 408:	e2 f7       	brpl	.-8      	; 0x402 <_Z7pollingPVhh+0x2a>
+ 40a:	b9 01       	movw	r22, r18
+		if(cntr++ > DEBOUNCE_DELAY){
+ 40c:	21 e0       	ldi	r18, 0x01	; 1
+ 40e:	30 e0       	ldi	r19, 0x00	; 0
+ 410:	d4 ef       	ldi	r29, 0xF4	; 244
+ 412:	c1 e0       	ldi	r28, 0x01	; 1
+			// Wait until the button released
+			dcntr = 0;
+			while(dcntr++ < DOUBLECLICK_DELAY){
+				cntr = 0;
+				while(!(*reg & 1 << bitno)){
+					if(cntr++ > DEBOUNCE_DELAY){
+ 414:	b1 e0       	ldi	r27, 0x01	; 1
+ 416:	a0 e0       	ldi	r26, 0x00	; 0
+		if(cntr++ > DEBOUNCE_DELAY){
+			// Wait until the button released
+			dcntr = 0;
+			while(dcntr++ < DOUBLECLICK_DELAY){
+				cntr = 0;
+				while(!(*reg & 1 << bitno)){
+ 418:	00 e0       	ldi	r16, 0x00	; 0
+ 41a:	10 e0       	ldi	r17, 0x00	; 0
+ 41c:	92 c0       	rjmp	.+292    	; 0x542 <_Z7pollingPVhh+0x16a>
+}
+
+u8 polling(volatile u8 *reg, u8 bitno){
+	u16 cntr = 0, dcntr;
+	while(*reg & 1 << bitno){
+		if(cntr++ > DEBOUNCE_DELAY){
+ 41e:	2b 30       	cpi	r18, 0x0B	; 11
+ 420:	31 05       	cpc	r19, r1
+ 422:	08 f4       	brcc	.+2      	; 0x426 <_Z7pollingPVhh+0x4e>
+ 424:	8c c0       	rjmp	.+280    	; 0x53e <_Z7pollingPVhh+0x166>
+ 426:	4d 2f       	mov	r20, r29
+ 428:	5c 2f       	mov	r21, r28
+ 42a:	80 c0       	rjmp	.+256    	; 0x52c <_Z7pollingPVhh+0x154>
+			// Wait until the button released
+			dcntr = 0;
+			while(dcntr++ < DOUBLECLICK_DELAY){
+				cntr = 0;
+				while(!(*reg & 1 << bitno)){
+					if(cntr++ > DEBOUNCE_DELAY){
+ 42c:	2f 5f       	subi	r18, 0xFF	; 255
+ 42e:	3f 4f       	sbci	r19, 0xFF	; 255
+ 430:	2c 30       	cpi	r18, 0x0C	; 12
+ 432:	31 05       	cpc	r19, r1
+ 434:	09 f0       	breq	.+2      	; 0x438 <_Z7pollingPVhh+0x60>
+ 436:	5f c0       	rjmp	.+190    	; 0x4f6 <_Z7pollingPVhh+0x11e>
+						// Wait for the second click
+						dcntr = 0;
+						while(dcntr++ < DOUBLECLICK_DELAY){
+ 438:	41 e0       	ldi	r20, 0x01	; 1
+ 43a:	50 e0       	ldi	r21, 0x00	; 0
+							cntr = 0;
+							while(*reg & 1 << bitno){
+								if(cntr++ > DEBOUNCE_DELAY){
+ 43c:	b1 e0       	ldi	r27, 0x01	; 1
+ 43e:	a0 e0       	ldi	r26, 0x00	; 0
+									// So the second click happened
+									dcntr = 0;
+									while(dcntr++ < DOUBLECLICK_DELAY){
+										cntr = 0;
+										while(!(*reg & 1 << bitno)){
+											if(cntr++ > DEBOUNCE_DELAY){
+ 440:	0b 2f       	mov	r16, r27
+ 442:	1a 2f       	mov	r17, r26
+ 444:	db 2f       	mov	r29, r27
+ 446:	ca 2f       	mov	r28, r26
+								if(cntr++ > DEBOUNCE_DELAY){
+									// So the second click happened
+									dcntr = 0;
+									while(dcntr++ < DOUBLECLICK_DELAY){
+										cntr = 0;
+										while(!(*reg & 1 << bitno)){
+ 448:	e1 2c       	mov	r14, r1
+ 44a:	f1 2c       	mov	r15, r1
+ 44c:	4b c0       	rjmp	.+150    	; 0x4e4 <_Z7pollingPVhh+0x10c>
+						// Wait for the second click
+						dcntr = 0;
+						while(dcntr++ < DOUBLECLICK_DELAY){
+							cntr = 0;
+							while(*reg & 1 << bitno){
+								if(cntr++ > DEBOUNCE_DELAY){
+ 44e:	2b 30       	cpi	r18, 0x0B	; 11
+ 450:	31 05       	cpc	r19, r1
+ 452:	68 f1       	brcs	.+90     	; 0x4ae <_Z7pollingPVhh+0xd6>
+									// So the second click happened
+									dcntr = 0;
+									while(dcntr++ < DOUBLECLICK_DELAY){
+ 454:	40 2f       	mov	r20, r16
+ 456:	51 2f       	mov	r21, r17
+ 458:	21 c0       	rjmp	.+66     	; 0x49c <_Z7pollingPVhh+0xc4>
+										cntr = 0;
+										while(!(*reg & 1 << bitno)){
+											if(cntr++ > DEBOUNCE_DELAY){
+ 45a:	2f 5f       	subi	r18, 0xFF	; 255
+ 45c:	3f 4f       	sbci	r19, 0xFF	; 255
+ 45e:	2c 30       	cpi	r18, 0x0C	; 12
+ 460:	31 05       	cpc	r19, r1
+ 462:	09 f4       	brne	.+2      	; 0x466 <_Z7pollingPVhh+0x8e>
+ 464:	7f c0       	rjmp	.+254    	; 0x564 <_Z7pollingPVhh+0x18c>
 	#else
 		//round up by default
 		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
 	#endif
 
 	__builtin_avr_delay_cycles(__ticks_dc);
- 40a:	8f ef       	ldi	r24, 0xFF	; 255
- 40c:	94 e3       	ldi	r25, 0x34	; 52
- 40e:	2c e0       	ldi	r18, 0x0C	; 12
- 410:	81 50       	subi	r24, 0x01	; 1
- 412:	90 40       	sbci	r25, 0x00	; 0
- 414:	20 40       	sbci	r18, 0x00	; 0
- 416:	e1 f7       	brne	.-8      	; 0x410 <main+0x38>
- 418:	00 c0       	rjmp	.+0      	; 0x41a <main+0x42>
- 41a:	00 00       	nop
-					_delay_ms(500);
-					Servo_ChangeDuty(CanSat1,calvar);
- 41c:	60 91 1a 01 	lds	r22, 0x011A
- 420:	70 91 1b 01 	lds	r23, 0x011B
- 424:	80 e0       	ldi	r24, 0x00	; 0
- 426:	98 de       	rcall	.-720    	; 0x158 <_Z16Servo_ChangeDuty9ServoNamet>
+ 466:	8f ec       	ldi	r24, 0xCF	; 207
+ 468:	97 e0       	ldi	r25, 0x07	; 7
+ 46a:	01 97       	sbiw	r24, 0x01	; 1
+ 46c:	f1 f7       	brne	.-4      	; 0x46a <_Z7pollingPVhh+0x92>
+ 46e:	00 c0       	rjmp	.+0      	; 0x470 <_Z7pollingPVhh+0x98>
+ 470:	00 00       	nop
+								if(cntr++ > DEBOUNCE_DELAY){
+									// So the second click happened
+									dcntr = 0;
+									while(dcntr++ < DOUBLECLICK_DELAY){
+										cntr = 0;
+										while(!(*reg & 1 << bitno)){
+ 472:	80 81       	ld	r24, Z
+ 474:	90 e0       	ldi	r25, 0x00	; 0
+ 476:	86 23       	and	r24, r22
+ 478:	97 23       	and	r25, r23
+ 47a:	89 2b       	or	r24, r25
+ 47c:	71 f3       	breq	.-36     	; 0x45a <_Z7pollingPVhh+0x82>
+ 47e:	02 c0       	rjmp	.+4      	; 0x484 <_Z7pollingPVhh+0xac>
+ 480:	2e 2d       	mov	r18, r14
+ 482:	3f 2d       	mov	r19, r15
+ 484:	8f ec       	ldi	r24, 0xCF	; 207
+ 486:	97 e0       	ldi	r25, 0x07	; 7
+ 488:	01 97       	sbiw	r24, 0x01	; 1
+ 48a:	f1 f7       	brne	.-4      	; 0x488 <_Z7pollingPVhh+0xb0>
+ 48c:	00 c0       	rjmp	.+0      	; 0x48e <_Z7pollingPVhh+0xb6>
+ 48e:	00 00       	nop
+							cntr = 0;
+							while(*reg & 1 << bitno){
+								if(cntr++ > DEBOUNCE_DELAY){
+									// So the second click happened
+									dcntr = 0;
+									while(dcntr++ < DOUBLECLICK_DELAY){
+ 490:	4f 5f       	subi	r20, 0xFF	; 255
+ 492:	5f 4f       	sbci	r21, 0xFF	; 255
+ 494:	45 3f       	cpi	r20, 0xF5	; 245
+ 496:	91 e0       	ldi	r25, 0x01	; 1
+ 498:	59 07       	cpc	r21, r25
+ 49a:	59 f0       	breq	.+22     	; 0x4b2 <_Z7pollingPVhh+0xda>
+										cntr = 0;
+										while(!(*reg & 1 << bitno)){
+ 49c:	80 81       	ld	r24, Z
+ 49e:	90 e0       	ldi	r25, 0x00	; 0
+ 4a0:	86 23       	and	r24, r22
+ 4a2:	97 23       	and	r25, r23
+ 4a4:	89 2b       	or	r24, r25
+ 4a6:	61 f7       	brne	.-40     	; 0x480 <_Z7pollingPVhh+0xa8>
+											if(cntr++ > DEBOUNCE_DELAY){
+ 4a8:	2d 2f       	mov	r18, r29
+ 4aa:	3c 2f       	mov	r19, r28
+ 4ac:	dc cf       	rjmp	.-72     	; 0x466 <_Z7pollingPVhh+0x8e>
+						// Wait for the second click
+						dcntr = 0;
+						while(dcntr++ < DOUBLECLICK_DELAY){
+							cntr = 0;
+							while(*reg & 1 << bitno){
+								if(cntr++ > DEBOUNCE_DELAY){
+ 4ae:	2f 5f       	subi	r18, 0xFF	; 255
+ 4b0:	3f 4f       	sbci	r19, 0xFF	; 255
+ 4b2:	8f ec       	ldi	r24, 0xCF	; 207
+ 4b4:	97 e0       	ldi	r25, 0x07	; 7
+ 4b6:	01 97       	sbiw	r24, 0x01	; 1
+ 4b8:	f1 f7       	brne	.-4      	; 0x4b6 <_Z7pollingPVhh+0xde>
+ 4ba:	00 c0       	rjmp	.+0      	; 0x4bc <_Z7pollingPVhh+0xe4>
+ 4bc:	00 00       	nop
+					if(cntr++ > DEBOUNCE_DELAY){
+						// Wait for the second click
+						dcntr = 0;
+						while(dcntr++ < DOUBLECLICK_DELAY){
+							cntr = 0;
+							while(*reg & 1 << bitno){
+ 4be:	80 81       	ld	r24, Z
+ 4c0:	90 e0       	ldi	r25, 0x00	; 0
+ 4c2:	86 23       	and	r24, r22
+ 4c4:	97 23       	and	r25, r23
+ 4c6:	89 2b       	or	r24, r25
+ 4c8:	11 f6       	brne	.-124    	; 0x44e <_Z7pollingPVhh+0x76>
+ 4ca:	8f ec       	ldi	r24, 0xCF	; 207
+ 4cc:	97 e0       	ldi	r25, 0x07	; 7
+ 4ce:	01 97       	sbiw	r24, 0x01	; 1
+ 4d0:	f1 f7       	brne	.-4      	; 0x4ce <_Z7pollingPVhh+0xf6>
+ 4d2:	00 c0       	rjmp	.+0      	; 0x4d4 <_Z7pollingPVhh+0xfc>
+ 4d4:	00 00       	nop
+				cntr = 0;
+				while(!(*reg & 1 << bitno)){
+					if(cntr++ > DEBOUNCE_DELAY){
+						// Wait for the second click
+						dcntr = 0;
+						while(dcntr++ < DOUBLECLICK_DELAY){
+ 4d6:	ca 01       	movw	r24, r20
+ 4d8:	01 96       	adiw	r24, 0x01	; 1
+ 4da:	44 3f       	cpi	r20, 0xF4	; 244
+ 4dc:	51 40       	sbci	r21, 0x01	; 1
+ 4de:	08 f0       	brcs	.+2      	; 0x4e2 <_Z7pollingPVhh+0x10a>
+ 4e0:	43 c0       	rjmp	.+134    	; 0x568 <_Z7pollingPVhh+0x190>
+ 4e2:	ac 01       	movw	r20, r24
+							cntr = 0;
+							while(*reg & 1 << bitno){
+ 4e4:	80 81       	ld	r24, Z
+ 4e6:	90 e0       	ldi	r25, 0x00	; 0
+ 4e8:	86 23       	and	r24, r22
+ 4ea:	97 23       	and	r25, r23
+ 4ec:	89 2b       	or	r24, r25
+ 4ee:	69 f3       	breq	.-38     	; 0x4ca <_Z7pollingPVhh+0xf2>
+								if(cntr++ > DEBOUNCE_DELAY){
+ 4f0:	2b 2f       	mov	r18, r27
+ 4f2:	3a 2f       	mov	r19, r26
+ 4f4:	de cf       	rjmp	.-68     	; 0x4b2 <_Z7pollingPVhh+0xda>
+ 4f6:	8f ec       	ldi	r24, 0xCF	; 207
+ 4f8:	97 e0       	ldi	r25, 0x07	; 7
+ 4fa:	01 97       	sbiw	r24, 0x01	; 1
+ 4fc:	f1 f7       	brne	.-4      	; 0x4fa <_Z7pollingPVhh+0x122>
+ 4fe:	00 c0       	rjmp	.+0      	; 0x500 <_Z7pollingPVhh+0x128>
+ 500:	00 00       	nop
+		if(cntr++ > DEBOUNCE_DELAY){
+			// Wait until the button released
+			dcntr = 0;
+			while(dcntr++ < DOUBLECLICK_DELAY){
+				cntr = 0;
+				while(!(*reg & 1 << bitno)){
+ 502:	80 81       	ld	r24, Z
+ 504:	90 e0       	ldi	r25, 0x00	; 0
+ 506:	86 23       	and	r24, r22
+ 508:	97 23       	and	r25, r23
+ 50a:	89 2b       	or	r24, r25
+ 50c:	09 f4       	brne	.+2      	; 0x510 <_Z7pollingPVhh+0x138>
+ 50e:	8e cf       	rjmp	.-228    	; 0x42c <_Z7pollingPVhh+0x54>
+ 510:	02 c0       	rjmp	.+4      	; 0x516 <_Z7pollingPVhh+0x13e>
+ 512:	20 2f       	mov	r18, r16
+ 514:	31 2f       	mov	r19, r17
+ 516:	8f ec       	ldi	r24, 0xCF	; 207
+ 518:	97 e0       	ldi	r25, 0x07	; 7
+ 51a:	01 97       	sbiw	r24, 0x01	; 1
+ 51c:	f1 f7       	brne	.-4      	; 0x51a <_Z7pollingPVhh+0x142>
+ 51e:	00 c0       	rjmp	.+0      	; 0x520 <_Z7pollingPVhh+0x148>
+ 520:	00 00       	nop
+ 522:	41 50       	subi	r20, 0x01	; 1
+ 524:	51 09       	sbc	r21, r1
+	u16 cntr = 0, dcntr;
+	while(*reg & 1 << bitno){
+		if(cntr++ > DEBOUNCE_DELAY){
+			// Wait until the button released
+			dcntr = 0;
+			while(dcntr++ < DOUBLECLICK_DELAY){
+ 526:	41 15       	cp	r20, r1
+ 528:	51 05       	cpc	r21, r1
+ 52a:	59 f0       	breq	.+22     	; 0x542 <_Z7pollingPVhh+0x16a>
+				cntr = 0;
+				while(!(*reg & 1 << bitno)){
+ 52c:	80 81       	ld	r24, Z
+ 52e:	90 e0       	ldi	r25, 0x00	; 0
+ 530:	86 23       	and	r24, r22
+ 532:	97 23       	and	r25, r23
+ 534:	89 2b       	or	r24, r25
+ 536:	69 f7       	brne	.-38     	; 0x512 <_Z7pollingPVhh+0x13a>
+					if(cntr++ > DEBOUNCE_DELAY){
+ 538:	2b 2f       	mov	r18, r27
+ 53a:	3a 2f       	mov	r19, r26
+ 53c:	dc cf       	rjmp	.-72     	; 0x4f6 <_Z7pollingPVhh+0x11e>
+}
+
+u8 polling(volatile u8 *reg, u8 bitno){
+	u16 cntr = 0, dcntr;
+	while(*reg & 1 << bitno){
+		if(cntr++ > DEBOUNCE_DELAY){
+ 53e:	2f 5f       	subi	r18, 0xFF	; 255
+ 540:	3f 4f       	sbci	r19, 0xFF	; 255
+ 542:	8f ec       	ldi	r24, 0xCF	; 207
+ 544:	97 e0       	ldi	r25, 0x07	; 7
+ 546:	01 97       	sbiw	r24, 0x01	; 1
+ 548:	f1 f7       	brne	.-4      	; 0x546 <_Z7pollingPVhh+0x16e>
+ 54a:	00 c0       	rjmp	.+0      	; 0x54c <_Z7pollingPVhh+0x174>
+ 54c:	00 00       	nop
+		}
+}
+
+u8 polling(volatile u8 *reg, u8 bitno){
+	u16 cntr = 0, dcntr;
+	while(*reg & 1 << bitno){
+ 54e:	80 81       	ld	r24, Z
+ 550:	90 e0       	ldi	r25, 0x00	; 0
+ 552:	86 23       	and	r24, r22
+ 554:	97 23       	and	r25, r23
+ 556:	89 2b       	or	r24, r25
+ 558:	09 f0       	breq	.+2      	; 0x55c <_Z7pollingPVhh+0x184>
+ 55a:	61 cf       	rjmp	.-318    	; 0x41e <_Z7pollingPVhh+0x46>
+				_delay_ms(1);
+			}
+		}
+		_delay_ms(1);
+	}
+	return 0;
+ 55c:	80 e0       	ldi	r24, 0x00	; 0
+ 55e:	05 c0       	rjmp	.+10     	; 0x56a <_Z7pollingPVhh+0x192>
+ 560:	80 e0       	ldi	r24, 0x00	; 0
+ 562:	03 c0       	rjmp	.+6      	; 0x56a <_Z7pollingPVhh+0x192>
+									dcntr = 0;
+									while(dcntr++ < DOUBLECLICK_DELAY){
+										cntr = 0;
+										while(!(*reg & 1 << bitno)){
+											if(cntr++ > DEBOUNCE_DELAY){
+												return 2;
+ 564:	82 e0       	ldi	r24, 0x02	; 2
+ 566:	01 c0       	rjmp	.+2      	; 0x56a <_Z7pollingPVhh+0x192>
+								_delay_ms(1);
+							}
+							_delay_ms(1);
+						}
+						// So there was only one click
+						return 1;
+ 568:	81 e0       	ldi	r24, 0x01	; 1
+			}
+		}
+		_delay_ms(1);
+	}
+	return 0;
+}
+ 56a:	df 91       	pop	r29
+ 56c:	cf 91       	pop	r28
+ 56e:	1f 91       	pop	r17
+ 570:	0f 91       	pop	r16
+ 572:	ff 90       	pop	r15
+ 574:	ef 90       	pop	r14
+ 576:	08 95       	ret
+
+00000578 <main>:
+
+int main(void)
+{
+	SP = 0xFFF;
+ 578:	8f ef       	ldi	r24, 0xFF	; 255
+ 57a:	9f e0       	ldi	r25, 0x0F	; 15
+ 57c:	9e bf       	out	0x3e, r25	; 62
+ 57e:	8d bf       	out	0x3d, r24	; 61
+	
 	Servo(CanSat1, Init);
+ 580:	60 e0       	ldi	r22, 0x00	; 0
+ 582:	80 e0       	ldi	r24, 0x00	; 0
+ 584:	5a de       	rcall	.-844    	; 0x23a <_Z5Servo9ServoName11ServoAction>
 	Servo(CanSat1, EnablePWM);
+ 586:	61 e0       	ldi	r22, 0x01	; 1
+ 588:	80 e0       	ldi	r24, 0x00	; 0
+ 58a:	57 de       	rcall	.-850    	; 0x23a <_Z5Servo9ServoName11ServoAction>
 	ATmega8_16bitTimer();
+ 58c:	76 de       	rcall	.-788    	; 0x27a <_Z18ATmega8_16bitTimerv>
 	sei();
+ 58e:	78 94       	sei
 	while(1){
-		for(calvar = 18000; calvar < 19000; calvar += 50){
- 428:	80 91 1a 01 	lds	r24, 0x011A
- 42c:	90 91 1b 01 	lds	r25, 0x011B
- 430:	c2 96       	adiw	r24, 0x32	; 50
- 432:	90 93 1b 01 	sts	0x011B, r25
- 436:	80 93 1a 01 	sts	0x011A, r24
- 43a:	80 91 1a 01 	lds	r24, 0x011A
- 43e:	90 91 1b 01 	lds	r25, 0x011B
- 442:	88 33       	cpi	r24, 0x38	; 56
- 444:	9a 44       	sbci	r25, 0x4A	; 74
- 446:	08 f3       	brcs	.-62     	; 0x40a <main+0x32>
- 448:	d5 cf       	rjmp	.-86     	; 0x3f4 <main+0x1c>
+		u8 retval = polling(&PINB, 1);
+ 590:	61 e0       	ldi	r22, 0x01	; 1
+ 592:	86 e3       	ldi	r24, 0x36	; 54
+ 594:	90 e0       	ldi	r25, 0x00	; 0
+ 596:	20 df       	rcall	.-448    	; 0x3d8 <_Z7pollingPVhh>
+		if(retval == 1){
+ 598:	81 30       	cpi	r24, 0x01	; 1
+ 59a:	29 f4       	brne	.+10     	; 0x5a6 <main+0x2e>
+			Servo_ChangeDuty(CanSat1, 18000);
+ 59c:	60 e5       	ldi	r22, 0x50	; 80
+ 59e:	76 e4       	ldi	r23, 0x46	; 70
+ 5a0:	80 e0       	ldi	r24, 0x00	; 0
+ 5a2:	da dd       	rcall	.-1100   	; 0x158 <_Z16Servo_ChangeDuty9ServoNamet>
+ 5a4:	f5 cf       	rjmp	.-22     	; 0x590 <main+0x18>
+		}else
+		if(retval == 2){
+ 5a6:	82 30       	cpi	r24, 0x02	; 2
+ 5a8:	99 f7       	brne	.-26     	; 0x590 <main+0x18>
+			Servo_ChangeDuty(CanSat1, 19000);
+ 5aa:	68 e3       	ldi	r22, 0x38	; 56
+ 5ac:	7a e4       	ldi	r23, 0x4A	; 74
+ 5ae:	80 e0       	ldi	r24, 0x00	; 0
+ 5b0:	d3 dd       	rcall	.-1114   	; 0x158 <_Z16Servo_ChangeDuty9ServoNamet>
+ 5b2:	ee cf       	rjmp	.-36     	; 0x590 <main+0x18>
 
-0000044a <_exit>:
- 44a:	f8 94       	cli
+000005b4 <_exit>:
+ 5b4:	f8 94       	cli
 
-0000044c <__stop_program>:
- 44c:	ff cf       	rjmp	.-2      	; 0x44c <__stop_program>
+000005b6 <__stop_program>:
+ 5b6:	ff cf       	rjmp	.-2      	; 0x5b6 <__stop_program>
