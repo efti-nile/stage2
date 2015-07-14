@@ -90,11 +90,21 @@ int main(void)
 {
 	SP = 0xFFF;
 	
+	PING &= ~0x07;
+	
 	Servo(CanSat1, Init);
-	Servo(CanSat1, EnablePWM);
+	Servo(CanSat2, Init);
+	Servo(CanSat3, Init);
+	Servo(Parachute, Init);
+	Servo(CanSatsHatchLock, Init);
+	Servo(ParachuteHatchLock, Init);
+	Servo(CanSatHatchOpening, Init);
+	Servo(Fins, Init);
+	
 	ATmega8_16bitTimer();
 	sei();
-	while(1){
+	
+	/*while(1){
 		u8 retval = polling(&PINB, 1);
 		if(retval == 1){
 			Servo_ChangeDuty(CanSat1, 18000);
@@ -102,11 +112,11 @@ int main(void)
 		if(retval == 2){
 			Servo_ChangeDuty(CanSat1, 19000);
 		}
-		/*for(calvar = 17500; calvar < 19500; calvar += 50){
+		for(calvar = 18500; ; ){
 					_delay_ms(100);
 					Servo_ChangeDuty(CanSat1,calvar);
-		}*/
-	}
+		}
+	}*/
 		
 	/*
 	// This loop used for actuators calibration
@@ -124,91 +134,209 @@ int main(void)
 		_delay_ms(10);
 	}*/
 	
-	BUTTONS_INIT; // Init buttons
+	//BUTTONS_INIT; // Init buttons
+	Servo(Fins, EnablePWM);
+	while(1);
+	
+	while(1){
+		// CS1
+		u8 tmp = polling(&PINF, 1);
+		if(tmp == 1){
+			pwmDutyTab[CanSat1] = CS1_CLOSED;
+			Servo(CanSat1, EnablePWM);
+			_delay_ms(1000);
+			Servo(CanSat1, DisablePWM);
+		}else if (tmp == 2){
+			pwmDutyTab[CanSat1] = CS1_OPENED;
+			Servo(CanSat1, EnablePWM);
+			_delay_ms(1000);
+			Servo(CanSat1, DisablePWM);
+		}
+		// CS2
+		tmp = polling(&PINF, 2);
+		if(tmp == 1){
+			pwmDutyTab[CanSat2] = CS2_CLOSED;
+			Servo(CanSat2, EnablePWM);
+			_delay_ms(1000);
+			Servo(CanSat2, DisablePWM);
+		}else if (tmp == 2){
+			pwmDutyTab[CanSat2] = CS2_OPENED;
+			Servo(CanSat2, EnablePWM);
+			_delay_ms(1000);
+			Servo(CanSat2, DisablePWM);
+		}
+		// CS3
+		tmp = polling(&PINF, 3);
+		if(tmp == 1){
+			pwmDutyTab[CanSat3] = CS3_CLOSED;
+			Servo(CanSat3, EnablePWM);
+			_delay_ms(1000);
+			Servo(CanSat3, DisablePWM);
+		}else if (tmp == 2){
+			pwmDutyTab[CanSat3] = CS3_OPENED;
+			Servo(CanSat3, EnablePWM);
+			_delay_ms(1000);
+			Servo(CanSat3, DisablePWM);
+		}
+		// P
+		tmp = polling(&PINA, 5);
+		if(tmp == 1){
+			pwmDutyTab[Parachute] = P_CLOSED;
+			Servo(Parachute, EnablePWM);
+			_delay_ms(1000);
+			Servo(Parachute, DisablePWM);
+		}else if (tmp == 2){
+			pwmDutyTab[Parachute] = P_OPENED;
+			Servo(Parachute, EnablePWM);
+			_delay_ms(1000);
+			Servo(Parachute, DisablePWM);
+		}
+		// CSHL
+		tmp = polling(&PINA, 6);
+		if(tmp == 1){
+				pwmDutyTab[CanSatsHatchLock] = CSHL_CLOSED;
+				Servo(CanSatsHatchLock, EnablePWM);
+				_delay_ms(1000);
+				Servo(CanSatsHatchLock, DisablePWM);
+		}else if (tmp == 2){
+				pwmDutyTab[CanSatsHatchLock] = CSHL_OPENED;
+				Servo(CanSatsHatchLock, EnablePWM);
+				_delay_ms(1000);
+				Servo(CanSatsHatchLock, DisablePWM);
+		}
+		// PHL
+		tmp = polling(&PIND, 1);
+		if(tmp == 1){
+			pwmDutyTab[ParachuteHatchLock] = PHL_CLOSED;
+			Servo(ParachuteHatchLock, EnablePWM);
+			_delay_ms(1000);
+			Servo(ParachuteHatchLock, DisablePWM);
+			}else if (tmp == 2){
+			pwmDutyTab[ParachuteHatchLock] = PHL_OPENED;
+			Servo(ParachuteHatchLock, EnablePWM);
+			_delay_ms(1000);
+			Servo(ParachuteHatchLock, DisablePWM);
+		}
+		// CHO
+		tmp = polling(&PIND, 3);
+		if(tmp == 1){
+			pwmDutyTab[CanSatHatchOpening] = CSO_CLOSED;
+			Servo(CanSatHatchOpening, EnablePWM);
+			_delay_ms(1000);
+			Servo(CanSatHatchOpening, DisablePWM);
+			}else if (tmp == 2){
+			pwmDutyTab[CanSatHatchOpening] = CSO_OPENED;
+			Servo(CanSatHatchOpening, EnablePWM);
+			_delay_ms(1000);
+			Servo(CanSatHatchOpening, DisablePWM);
+		}
+	}
+	
 	while(1){
 		// CanSat1 actuator
-		switch(polling(&PINE, 5)){
+		switch(polling(&PINF, 1)){
 			case 1:
 				pwmDutyTab[CanSat1] = CS1_CLOSED;
 				Servo(CanSat1, EnablePWM);
+				_delay_ms(1000);
+				Servo(CanSat1, DisablePWM);
 				break;
 			case 2:
 				pwmDutyTab[CanSat1] = CS1_OPENED;
 				Servo(CanSat1, EnablePWM);
-				break;
+				_delay_ms(1000);
+				Servo(CanSat1, DisablePWM);
 				break;
 		}
 		// CanSat2 actuator
-		switch(polling(&PINE, 6)){
+		switch(polling(&PINF, 2)){
 			case 1:
-			pwmDutyTab[CanSat2] = CS2_CLOSED;
-			Servo(CanSat2, EnablePWM);
-			break;
+				pwmDutyTab[CanSat2] = CS2_CLOSED;
+				Servo(CanSat2, EnablePWM);
+				_delay_ms(1000);
+				Servo(CanSat2, DisablePWM);
+				break;
 			case 2:
-			pwmDutyTab[CanSat2] = CS2_OPENED;
-			Servo(CanSat2, EnablePWM);
-			break;
-			break;
+				pwmDutyTab[CanSat2] = CS2_OPENED;
+				Servo(CanSat2, EnablePWM);
+				_delay_ms(1000);
+				Servo(CanSat2, DisablePWM);
+				break;
 		}
 		// CanSat3 actuator
-		switch(polling(&PINE, 7)){
+		switch(polling(&PINF, 3)){
 			case 1:
-			pwmDutyTab[CanSat3] = CS3_CLOSED;
-			Servo(CanSat3, EnablePWM);
-			break;
+				pwmDutyTab[CanSat3] = CS3_CLOSED;
+				Servo(CanSat3, EnablePWM);
+				_delay_ms(1000);
+				Servo(CanSat3, DisablePWM);
+				break;
 			case 2:
-			pwmDutyTab[CanSat3] = CS3_OPENED;
-			Servo(CanSat3, EnablePWM);
-			break;
-			break;
+				pwmDutyTab[CanSat3] = CS3_OPENED;
+				Servo(CanSat3, EnablePWM);
+				_delay_ms(1000);
+				Servo(CanSat3, DisablePWM);
+				break;
 		}
 		// Parachute actuator
-		switch(polling(&PING, 0)){
+		switch(polling(&PING, 2)){
 			case 1:
-			pwmDutyTab[Parachute] = P_CLOSED;
-			Servo(Parachute, EnablePWM);
-			break;
+				pwmDutyTab[Parachute] = P_CLOSED;
+				Servo(Parachute, EnablePWM);
+				_delay_ms(1000);
+				Servo(Parachute, DisablePWM);
+				break;
 			case 2:
-			pwmDutyTab[Parachute] = P_OPENED;
-			Servo(Parachute, EnablePWM);
-			break;
-			break;
+				pwmDutyTab[Parachute] = P_OPENED;
+				Servo(Parachute, EnablePWM);
+				_delay_ms(1000);
+				Servo(Parachute, DisablePWM);
+				break;
 		}
 		// CanSat hatch lock actuator
 		switch(polling(&PING, 1)){
 			case 1:
-			pwmDutyTab[CanSatsHatchLock] = CSHL_CLOSED;
-			Servo(CanSatsHatchLock, EnablePWM);
-			break;
+				pwmDutyTab[CanSatsHatchLock] = CSHL_CLOSED;
+				Servo(CanSatsHatchLock, EnablePWM);
+				_delay_ms(1000);
+				Servo(CanSatsHatchLock, DisablePWM);
+				break;
 			case 2:
-			pwmDutyTab[CanSatsHatchLock] = CSHL_OPENED;
-			Servo(CanSatsHatchLock, EnablePWM);
-			break;
-			break;
+				pwmDutyTab[CanSatsHatchLock] = CSHL_OPENED;
+				Servo(CanSatsHatchLock, EnablePWM);
+				_delay_ms(1000);
+				Servo(CanSatsHatchLock, DisablePWM);
+				break;
 		}
 		// Parachute hatch lock actuator
-		switch(polling(&PING, 2)){
+		switch(polling(&PING, 0)){
 			case 1:
-			pwmDutyTab[ParachuteHatchLock] = PHL_CLOSED;
-			Servo(ParachuteHatchLock, EnablePWM);
-			break;
+				pwmDutyTab[ParachuteHatchLock] = PHL_CLOSED;
+				Servo(ParachuteHatchLock, EnablePWM);
+				_delay_ms(1000);
+				Servo(ParachuteHatchLock, DisablePWM);
+				break;
 			case 2:
-			pwmDutyTab[ParachuteHatchLock] = PHL_OPENED;
-			Servo(ParachuteHatchLock, EnablePWM);
-			break;
-			break;
+				pwmDutyTab[ParachuteHatchLock] = PHL_OPENED;
+				Servo(ParachuteHatchLock, EnablePWM);
+				_delay_ms(1000);
+				Servo(ParachuteHatchLock, DisablePWM);
+				break;
 		}
 		// CanSat hatch opening actuator
 		switch(polling(&PING, 3)){
 			case 1:
-			pwmDutyTab[CanSatHatchOpening] = CSO_CLOSED;
-			Servo(CanSatHatchOpening, EnablePWM);
-			break;
+				pwmDutyTab[CanSatHatchOpening] = CSO_CLOSED;
+				Servo(CanSatHatchOpening, EnablePWM);
+				_delay_ms(1000);
+				Servo(CanSatHatchOpening, DisablePWM);
+				break;
 			case 2:
-			pwmDutyTab[CanSatHatchOpening] = CSO_OPENED;
-			Servo(CanSatHatchOpening, EnablePWM);
-			break;
-			break;
+				pwmDutyTab[CanSatHatchOpening] = CSO_OPENED;
+				Servo(CanSatHatchOpening, EnablePWM);
+				_delay_ms(1000);
+				Servo(CanSatHatchOpening, DisablePWM);
+				break;
 		}
 	}
 	

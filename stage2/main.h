@@ -51,26 +51,26 @@
 #define DEBOUNCE_DELAY 10
 #define DOUBLECLICK_DELAY 500
 
-#define CS1_CLOSED 850
-#define CS1_OPENED 870
+#define CS1_CLOSED 19010
+#define CS1_OPENED 18700
 
-#define CS2_CLOSED 890
-#define CS2_OPENED 910
+#define CS2_CLOSED 18990
+#define CS2_OPENED 18300
 
-#define CS3_CLOSED 930
-#define CS3_OPENED 950
+#define CS3_CLOSED 18000
+#define CS3_OPENED 18710
 
-#define P_CLOSED 970
-#define P_OPENED 990
+#define P_CLOSED 19020
+#define P_OPENED 18010
 
-#define CSHL_CLOSED 1010
-#define CSHL_OPENED 1030
+#define CSHL_CLOSED 18500
+#define CSHL_OPENED 19300
 
-#define PHL_CLOSED 1050
-#define PHL_OPENED 1070
+#define PHL_CLOSED 18690
+#define PHL_OPENED 18200
 
-#define CSO_CLOSED 1090
-#define CSO_OPENED 1110
+#define CSO_CLOSED 17900
+#define CSO_OPENED 19700
 
 
 // Local protoypes

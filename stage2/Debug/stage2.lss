@@ -3,29 +3,29 @@ stage2.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .data         00000052  00800100  000005b8  0000064c  2**0
+  0 .data         00000052  00800100  0000040c  000004a0  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  1 .text         000005b8  00000000  00000000  00000094  2**1
+  1 .text         0000040c  00000000  00000000  00000094  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .bss          00000001  00800152  00800152  0000069e  2**0
+  2 .bss          00000001  00800152  00800152  000004f2  2**0
                   ALLOC
-  3 .comment      00000030  00000000  00000000  0000069e  2**0
+  3 .comment      00000030  00000000  00000000  000004f2  2**0
                   CONTENTS, READONLY
-  4 .debug_aranges 00000070  00000000  00000000  000006ce  2**0
+  4 .debug_aranges 00000078  00000000  00000000  00000522  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_info   00000882  00000000  00000000  0000073e  2**0
+  5 .debug_info   000008ea  00000000  00000000  0000059a  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_abbrev 00000406  00000000  00000000  00000fc0  2**0
+  6 .debug_abbrev 000003f0  00000000  00000000  00000e84  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_line   000004cd  00000000  00000000  000013c6  2**0
+  7 .debug_line   00000551  00000000  00000000  00001274  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_frame  00000120  00000000  00000000  00001894  2**2
+  8 .debug_frame  00000130  00000000  00000000  000017c8  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    000003a9  00000000  00000000  000019b4  2**0
+  9 .debug_str    00000395  00000000  00000000  000018f8  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_loc    0000083f  00000000  00000000  00001d5d  2**0
+ 10 .debug_loc    000008da  00000000  00000000  00001c8d  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_ranges 00000050  00000000  00000000  0000259c  2**0
+ 11 .debug_ranges 00000058  00000000  00000000  00002567  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -59,7 +59,7 @@ Disassembly of section .text:
   32:	00 00       	nop
   34:	48 c0       	rjmp	.+144    	; 0xc6 <__bad_interrupt>
   36:	00 00       	nop
-  38:	2a c1       	rjmp	.+596    	; 0x28e <__vector_14>
+  38:	1b c1       	rjmp	.+566    	; 0x270 <__vector_14>
   3a:	00 00       	nop
   3c:	44 c0       	rjmp	.+136    	; 0xc6 <__bad_interrupt>
   3e:	00 00       	nop
@@ -114,8 +114,8 @@ Disassembly of section .text:
   98:	11 e0       	ldi	r17, 0x01	; 1
   9a:	a0 e0       	ldi	r26, 0x00	; 0
   9c:	b1 e0       	ldi	r27, 0x01	; 1
-  9e:	e8 eb       	ldi	r30, 0xB8	; 184
-  a0:	f5 e0       	ldi	r31, 0x05	; 5
+  9e:	ec e0       	ldi	r30, 0x0C	; 12
+  a0:	f4 e0       	ldi	r31, 0x04	; 4
   a2:	00 e0       	ldi	r16, 0x00	; 0
   a4:	0b bf       	out	0x3b, r16	; 59
   a6:	02 c0       	rjmp	.+4      	; 0xac <__do_copy_data+0x14>
@@ -138,29 +138,22 @@ Disassembly of section .text:
   bc:	a3 35       	cpi	r26, 0x53	; 83
   be:	b2 07       	cpc	r27, r18
   c0:	e1 f7       	brne	.-8      	; 0xba <.do_clear_bss_loop>
-  c2:	5a d2       	rcall	.+1204   	; 0x578 <main>
-  c4:	77 c2       	rjmp	.+1262   	; 0x5b4 <_exit>
+  c2:	7b d1       	rcall	.+758    	; 0x3ba <main>
+  c4:	a1 c1       	rjmp	.+834    	; 0x408 <_exit>
 
 000000c6 <__bad_interrupt>:
   c6:	9c cf       	rjmp	.-200    	; 0x0 <__vectors>
 
 000000c8 <_Z14PWM_AddChannelh>:
-void PWM_AddChannel(u8 channel){
-	u8 i, j;
-	
-	// Search for the first element not less than pwmDutyTab[channel]
-	for( i = 0; 
-	     i < ActiveChann.Num && pwmDutyTab[ActiveChann.Tab[i]] < pwmDutyTab[channel]; 
+	}
+	pwmDutyTab[(u8)s] = newDuty;
+	asm("sei\n");
+	PWM_AddChannel((u8)s);
+	return 0;
+}
   c8:	90 91 08 01 	lds	r25, 0x0108
-
-void PWM_AddChannel(u8 channel){
-	u8 i, j;
-	
-	// Search for the first element not less than pwmDutyTab[channel]
-	for( i = 0; 
   cc:	99 23       	and	r25, r25
   ce:	31 f1       	breq	.+76     	; 0x11c <_Z14PWM_AddChannelh+0x54>
-	     i < ActiveChann.Num && pwmDutyTab[ActiveChann.Tab[i]] < pwmDutyTab[channel]; 
   d0:	e8 2f       	mov	r30, r24
   d2:	f0 e0       	ldi	r31, 0x00	; 0
   d4:	ee 0f       	add	r30, r30
@@ -182,17 +175,10 @@ void PWM_AddChannel(u8 channel){
   f6:	a0 f4       	brcc	.+40     	; 0x120 <_Z14PWM_AddChannelh+0x58>
   f8:	e1 e0       	ldi	r30, 0x01	; 1
   fa:	f1 e0       	ldi	r31, 0x01	; 1
-
-void PWM_AddChannel(u8 channel){
-	u8 i, j;
-	
-	// Search for the first element not less than pwmDutyTab[channel]
-	for( i = 0; 
   fc:	60 e0       	ldi	r22, 0x00	; 0
   fe:	6f 5f       	subi	r22, 0xFF	; 255
  100:	69 17       	cp	r22, r25
  102:	79 f0       	breq	.+30     	; 0x122 <_Z14PWM_AddChannelh+0x5a>
-	     i < ActiveChann.Num && pwmDutyTab[ActiveChann.Tab[i]] < pwmDutyTab[channel]; 
  104:	a1 91       	ld	r26, Z+
  106:	b0 e0       	ldi	r27, 0x00	; 0
  108:	aa 0f       	add	r26, r26
@@ -205,27 +191,13 @@ void PWM_AddChannel(u8 channel){
  116:	35 07       	cpc	r19, r21
  118:	90 f3       	brcs	.-28     	; 0xfe <_Z14PWM_AddChannelh+0x36>
  11a:	03 c0       	rjmp	.+6      	; 0x122 <_Z14PWM_AddChannelh+0x5a>
-
-void PWM_AddChannel(u8 channel){
-	u8 i, j;
-	
-	// Search for the first element not less than pwmDutyTab[channel]
-	for( i = 0; 
  11c:	69 2f       	mov	r22, r25
  11e:	01 c0       	rjmp	.+2      	; 0x122 <_Z14PWM_AddChannelh+0x5a>
  120:	60 e0       	ldi	r22, 0x00	; 0
-		 ++i );
-	
-	// Move all element not less than
-	// pwmDutyTab[channel] up for 1 index.
-	// After add new element in the formed gap.
-	asm("cli\n");
  122:	f8 94       	cli
-    for( j = ActiveChann.Num; j > i; --j){
  124:	69 17       	cp	r22, r25
  126:	68 f4       	brcc	.+26     	; 0x142 <_Z14PWM_AddChannelh+0x7a>
  128:	29 2f       	mov	r18, r25
-		ActiveChann.Tab[j] = ActiveChann.Tab[j-1];
  12a:	e2 2f       	mov	r30, r18
  12c:	f0 e0       	ldi	r31, 0x00	; 0
  12e:	e0 50       	subi	r30, 0x00	; 0
@@ -234,884 +206,418 @@ void PWM_AddChannel(u8 channel){
  134:	11 97       	sbiw	r26, 0x01	; 1
  136:	3c 91       	ld	r19, X
  138:	30 83       	st	Z, r19
-	
-	// Move all element not less than
-	// pwmDutyTab[channel] up for 1 index.
-	// After add new element in the formed gap.
-	asm("cli\n");
-    for( j = ActiveChann.Num; j > i; --j){
  13a:	21 50       	subi	r18, 0x01	; 1
  13c:	26 13       	cpse	r18, r22
  13e:	f5 cf       	rjmp	.-22     	; 0x12a <_Z14PWM_AddChannelh+0x62>
  140:	01 c0       	rjmp	.+2      	; 0x144 <_Z14PWM_AddChannelh+0x7c>
  142:	69 2f       	mov	r22, r25
-		ActiveChann.Tab[j] = ActiveChann.Tab[j-1];
-	}
-	ActiveChann.Tab[j] = channel;
  144:	e6 2f       	mov	r30, r22
  146:	f0 e0       	ldi	r31, 0x00	; 0
  148:	e0 50       	subi	r30, 0x00	; 0
  14a:	ff 4f       	sbci	r31, 0xFF	; 255
  14c:	80 83       	st	Z, r24
-	asm("sei\n");
  14e:	78 94       	sei
-	
-	++ActiveChann.Num;
  150:	9f 5f       	subi	r25, 0xFF	; 255
  152:	90 93 08 01 	sts	0x0108, r25
  156:	08 95       	ret
 
-00000158 <_Z16Servo_ChangeDuty9ServoNamet>:
-}
+00000158 <_Z17PWM_DeleteChannelh>:
+ 158:	90 91 52 01 	lds	r25, 0x0152
+ 15c:	99 23       	and	r25, r25
+ 15e:	e1 f3       	breq	.-8      	; 0x158 <_Z17PWM_DeleteChannelh>
+ 160:	f8 94       	cli
+ 162:	30 91 08 01 	lds	r19, 0x0108
+ 166:	33 23       	and	r19, r19
+ 168:	09 f1       	breq	.+66     	; 0x1ac <_Z17PWM_DeleteChannelh+0x54>
+ 16a:	90 91 00 01 	lds	r25, 0x0100
+ 16e:	98 13       	cpse	r25, r24
+ 170:	17 c0       	rjmp	.+46     	; 0x1a0 <_Z17PWM_DeleteChannelh+0x48>
+ 172:	04 c0       	rjmp	.+8      	; 0x17c <_Z17PWM_DeleteChannelh+0x24>
+ 174:	21 91       	ld	r18, Z+
+ 176:	28 13       	cpse	r18, r24
+ 178:	16 c0       	rjmp	.+44     	; 0x1a6 <_Z17PWM_DeleteChannelh+0x4e>
+ 17a:	01 c0       	rjmp	.+2      	; 0x17e <_Z17PWM_DeleteChannelh+0x26>
+ 17c:	90 e0       	ldi	r25, 0x00	; 0
+ 17e:	9f 5f       	subi	r25, 0xFF	; 255
+ 180:	93 17       	cp	r25, r19
+ 182:	50 f4       	brcc	.+20     	; 0x198 <_Z17PWM_DeleteChannelh+0x40>
+ 184:	e9 2f       	mov	r30, r25
+ 186:	f0 e0       	ldi	r31, 0x00	; 0
+ 188:	e0 50       	subi	r30, 0x00	; 0
+ 18a:	ff 4f       	sbci	r31, 0xFF	; 255
+ 18c:	80 81       	ld	r24, Z
+ 18e:	31 97       	sbiw	r30, 0x01	; 1
+ 190:	80 83       	st	Z, r24
+ 192:	9f 5f       	subi	r25, 0xFF	; 255
+ 194:	93 13       	cpse	r25, r19
+ 196:	f6 cf       	rjmp	.-20     	; 0x184 <_Z17PWM_DeleteChannelh+0x2c>
+ 198:	31 50       	subi	r19, 0x01	; 1
+ 19a:	30 93 08 01 	sts	0x0108, r19
+ 19e:	06 c0       	rjmp	.+12     	; 0x1ac <_Z17PWM_DeleteChannelh+0x54>
+ 1a0:	e1 e0       	ldi	r30, 0x01	; 1
+ 1a2:	f1 e0       	ldi	r31, 0x01	; 1
+ 1a4:	90 e0       	ldi	r25, 0x00	; 0
+ 1a6:	9f 5f       	subi	r25, 0xFF	; 255
+ 1a8:	93 13       	cpse	r25, r19
+ 1aa:	e4 cf       	rjmp	.-56     	; 0x174 <_Z17PWM_DeleteChannelh+0x1c>
+ 1ac:	78 94       	sei
+ 1ae:	08 95       	ret
 
-u8 Servo_ChangeDuty(enum ServoName s, u16 newDuty){
-	u8 i;
-	if(newDuty < 10 || newDuty > SERVO_PWM_PERIOD_US - 10){
- 158:	9b 01       	movw	r18, r22
- 15a:	2a 50       	subi	r18, 0x0A	; 10
- 15c:	31 09       	sbc	r19, r1
- 15e:	2d 30       	cpi	r18, 0x0D	; 13
- 160:	3e 44       	sbci	r19, 0x4E	; 78
- 162:	b0 f5       	brcc	.+108    	; 0x1d0 <_Z16Servo_ChangeDuty9ServoNamet+0x78>
-		return 1;
-	};
-	while(!pwmCanBeChanged);
- 164:	90 91 52 01 	lds	r25, 0x0152
- 168:	99 23       	and	r25, r25
- 16a:	e1 f3       	breq	.-8      	; 0x164 <_Z16Servo_ChangeDuty9ServoNamet+0xc>
-	asm("cli\n");
- 16c:	f8 94       	cli
-	for(i = 0; i < ActiveChann.Num; i++){
- 16e:	30 91 08 01 	lds	r19, 0x0108
- 172:	33 23       	and	r19, r19
- 174:	09 f1       	breq	.+66     	; 0x1b8 <_Z16Servo_ChangeDuty9ServoNamet+0x60>
-		if(ActiveChann.Tab[i] == (u8)s){
- 176:	90 91 00 01 	lds	r25, 0x0100
- 17a:	98 13       	cpse	r25, r24
- 17c:	17 c0       	rjmp	.+46     	; 0x1ac <_Z16Servo_ChangeDuty9ServoNamet+0x54>
- 17e:	04 c0       	rjmp	.+8      	; 0x188 <_Z16Servo_ChangeDuty9ServoNamet+0x30>
- 180:	21 91       	ld	r18, Z+
- 182:	28 13       	cpse	r18, r24
- 184:	16 c0       	rjmp	.+44     	; 0x1b2 <_Z16Servo_ChangeDuty9ServoNamet+0x5a>
- 186:	01 c0       	rjmp	.+2      	; 0x18a <_Z16Servo_ChangeDuty9ServoNamet+0x32>
-	if(newDuty < 10 || newDuty > SERVO_PWM_PERIOD_US - 10){
-		return 1;
-	};
-	while(!pwmCanBeChanged);
-	asm("cli\n");
-	for(i = 0; i < ActiveChann.Num; i++){
- 188:	90 e0       	ldi	r25, 0x00	; 0
-		if(ActiveChann.Tab[i] == (u8)s){
-			for(i++; i < ActiveChann.Num; i++){
- 18a:	9f 5f       	subi	r25, 0xFF	; 255
- 18c:	93 17       	cp	r25, r19
- 18e:	50 f4       	brcc	.+20     	; 0x1a4 <_Z16Servo_ChangeDuty9ServoNamet+0x4c>
-				ActiveChann.Tab[i-1] = ActiveChann.Tab[i];
- 190:	e9 2f       	mov	r30, r25
- 192:	f0 e0       	ldi	r31, 0x00	; 0
- 194:	e0 50       	subi	r30, 0x00	; 0
- 196:	ff 4f       	sbci	r31, 0xFF	; 255
- 198:	20 81       	ld	r18, Z
- 19a:	31 97       	sbiw	r30, 0x01	; 1
- 19c:	20 83       	st	Z, r18
-	};
-	while(!pwmCanBeChanged);
-	asm("cli\n");
-	for(i = 0; i < ActiveChann.Num; i++){
-		if(ActiveChann.Tab[i] == (u8)s){
-			for(i++; i < ActiveChann.Num; i++){
- 19e:	9f 5f       	subi	r25, 0xFF	; 255
- 1a0:	93 13       	cpse	r25, r19
- 1a2:	f6 cf       	rjmp	.-20     	; 0x190 <_Z16Servo_ChangeDuty9ServoNamet+0x38>
-				ActiveChann.Tab[i-1] = ActiveChann.Tab[i];
-			}
-			ActiveChann.Num--;
- 1a4:	31 50       	subi	r19, 0x01	; 1
- 1a6:	30 93 08 01 	sts	0x0108, r19
-			break;
- 1aa:	06 c0       	rjmp	.+12     	; 0x1b8 <_Z16Servo_ChangeDuty9ServoNamet+0x60>
- 1ac:	e1 e0       	ldi	r30, 0x01	; 1
- 1ae:	f1 e0       	ldi	r31, 0x01	; 1
-	if(newDuty < 10 || newDuty > SERVO_PWM_PERIOD_US - 10){
-		return 1;
-	};
-	while(!pwmCanBeChanged);
-	asm("cli\n");
-	for(i = 0; i < ActiveChann.Num; i++){
- 1b0:	90 e0       	ldi	r25, 0x00	; 0
- 1b2:	9f 5f       	subi	r25, 0xFF	; 255
- 1b4:	93 13       	cpse	r25, r19
- 1b6:	e4 cf       	rjmp	.-56     	; 0x180 <_Z16Servo_ChangeDuty9ServoNamet+0x28>
-			}
-			ActiveChann.Num--;
-			break;
-		}
-	}
-	asm("sei\n");
- 1b8:	78 94       	sei
-	pwmDutyTab[(u8)s] = newDuty;
- 1ba:	e8 2f       	mov	r30, r24
- 1bc:	f0 e0       	ldi	r31, 0x00	; 0
- 1be:	ee 0f       	add	r30, r30
- 1c0:	ff 1f       	adc	r31, r31
- 1c2:	e6 5f       	subi	r30, 0xF6	; 246
- 1c4:	fe 4f       	sbci	r31, 0xFE	; 254
- 1c6:	71 83       	std	Z+1, r23	; 0x01
- 1c8:	60 83       	st	Z, r22
-	PWM_AddChannel((u8)s);
- 1ca:	7e df       	rcall	.-260    	; 0xc8 <_Z14PWM_AddChannelh>
-	return 0;
- 1cc:	80 e0       	ldi	r24, 0x00	; 0
- 1ce:	08 95       	ret
-}
-
-u8 Servo_ChangeDuty(enum ServoName s, u16 newDuty){
-	u8 i;
-	if(newDuty < 10 || newDuty > SERVO_PWM_PERIOD_US - 10){
-		return 1;
- 1d0:	81 e0       	ldi	r24, 0x01	; 1
-	}
-	asm("sei\n");
-	pwmDutyTab[(u8)s] = newDuty;
-	PWM_AddChannel((u8)s);
-	return 0;
-}
- 1d2:	08 95       	ret
-
-000001d4 <_Z6PinOuthh>:
+000001b0 <_Z6PinOuthh>:
 
 void PinOut(u8 channel, u8 out){
 	if(out){
- 1d4:	66 23       	and	r22, r22
- 1d6:	c1 f0       	breq	.+48     	; 0x208 <_Z6PinOuthh+0x34>
+ 1b0:	66 23       	and	r22, r22
+ 1b2:	c1 f0       	breq	.+48     	; 0x1e4 <_Z6PinOuthh+0x34>
 		*pinTab[channel].PORT |= 1 << pinTab[channel].p;
- 1d8:	97 e0       	ldi	r25, 0x07	; 7
- 1da:	89 9f       	mul	r24, r25
- 1dc:	d0 01       	movw	r26, r0
- 1de:	11 24       	eor	r1, r1
- 1e0:	a6 5e       	subi	r26, 0xE6	; 230
- 1e2:	be 4f       	sbci	r27, 0xFE	; 254
- 1e4:	12 96       	adiw	r26, 0x02	; 2
- 1e6:	ed 91       	ld	r30, X+
- 1e8:	fc 91       	ld	r31, X
- 1ea:	13 97       	sbiw	r26, 0x03	; 3
- 1ec:	40 81       	ld	r20, Z
- 1ee:	21 e0       	ldi	r18, 0x01	; 1
- 1f0:	30 e0       	ldi	r19, 0x00	; 0
- 1f2:	c9 01       	movw	r24, r18
- 1f4:	16 96       	adiw	r26, 0x06	; 6
- 1f6:	0c 90       	ld	r0, X
- 1f8:	02 c0       	rjmp	.+4      	; 0x1fe <_Z6PinOuthh+0x2a>
- 1fa:	88 0f       	add	r24, r24
- 1fc:	99 1f       	adc	r25, r25
- 1fe:	0a 94       	dec	r0
- 200:	e2 f7       	brpl	.-8      	; 0x1fa <_Z6PinOuthh+0x26>
- 202:	84 2b       	or	r24, r20
- 204:	80 83       	st	Z, r24
- 206:	08 95       	ret
+ 1b4:	97 e0       	ldi	r25, 0x07	; 7
+ 1b6:	89 9f       	mul	r24, r25
+ 1b8:	d0 01       	movw	r26, r0
+ 1ba:	11 24       	eor	r1, r1
+ 1bc:	a6 5e       	subi	r26, 0xE6	; 230
+ 1be:	be 4f       	sbci	r27, 0xFE	; 254
+ 1c0:	12 96       	adiw	r26, 0x02	; 2
+ 1c2:	ed 91       	ld	r30, X+
+ 1c4:	fc 91       	ld	r31, X
+ 1c6:	13 97       	sbiw	r26, 0x03	; 3
+ 1c8:	40 81       	ld	r20, Z
+ 1ca:	21 e0       	ldi	r18, 0x01	; 1
+ 1cc:	30 e0       	ldi	r19, 0x00	; 0
+ 1ce:	c9 01       	movw	r24, r18
+ 1d0:	16 96       	adiw	r26, 0x06	; 6
+ 1d2:	0c 90       	ld	r0, X
+ 1d4:	02 c0       	rjmp	.+4      	; 0x1da <_Z6PinOuthh+0x2a>
+ 1d6:	88 0f       	add	r24, r24
+ 1d8:	99 1f       	adc	r25, r25
+ 1da:	0a 94       	dec	r0
+ 1dc:	e2 f7       	brpl	.-8      	; 0x1d6 <_Z6PinOuthh+0x26>
+ 1de:	84 2b       	or	r24, r20
+ 1e0:	80 83       	st	Z, r24
+ 1e2:	08 95       	ret
 	}else{
 		*pinTab[channel].PORT &= ~(1 << pinTab[channel].p);
- 208:	97 e0       	ldi	r25, 0x07	; 7
- 20a:	89 9f       	mul	r24, r25
- 20c:	d0 01       	movw	r26, r0
- 20e:	11 24       	eor	r1, r1
- 210:	a6 5e       	subi	r26, 0xE6	; 230
- 212:	be 4f       	sbci	r27, 0xFE	; 254
- 214:	12 96       	adiw	r26, 0x02	; 2
- 216:	ed 91       	ld	r30, X+
- 218:	fc 91       	ld	r31, X
- 21a:	13 97       	sbiw	r26, 0x03	; 3
- 21c:	40 81       	ld	r20, Z
- 21e:	21 e0       	ldi	r18, 0x01	; 1
- 220:	30 e0       	ldi	r19, 0x00	; 0
- 222:	c9 01       	movw	r24, r18
- 224:	16 96       	adiw	r26, 0x06	; 6
- 226:	0c 90       	ld	r0, X
- 228:	02 c0       	rjmp	.+4      	; 0x22e <_Z6PinOuthh+0x5a>
- 22a:	88 0f       	add	r24, r24
- 22c:	99 1f       	adc	r25, r25
- 22e:	0a 94       	dec	r0
- 230:	e2 f7       	brpl	.-8      	; 0x22a <_Z6PinOuthh+0x56>
- 232:	80 95       	com	r24
- 234:	84 23       	and	r24, r20
- 236:	80 83       	st	Z, r24
- 238:	08 95       	ret
+ 1e4:	97 e0       	ldi	r25, 0x07	; 7
+ 1e6:	89 9f       	mul	r24, r25
+ 1e8:	d0 01       	movw	r26, r0
+ 1ea:	11 24       	eor	r1, r1
+ 1ec:	a6 5e       	subi	r26, 0xE6	; 230
+ 1ee:	be 4f       	sbci	r27, 0xFE	; 254
+ 1f0:	12 96       	adiw	r26, 0x02	; 2
+ 1f2:	ed 91       	ld	r30, X+
+ 1f4:	fc 91       	ld	r31, X
+ 1f6:	13 97       	sbiw	r26, 0x03	; 3
+ 1f8:	40 81       	ld	r20, Z
+ 1fa:	21 e0       	ldi	r18, 0x01	; 1
+ 1fc:	30 e0       	ldi	r19, 0x00	; 0
+ 1fe:	c9 01       	movw	r24, r18
+ 200:	16 96       	adiw	r26, 0x06	; 6
+ 202:	0c 90       	ld	r0, X
+ 204:	02 c0       	rjmp	.+4      	; 0x20a <_Z6PinOuthh+0x5a>
+ 206:	88 0f       	add	r24, r24
+ 208:	99 1f       	adc	r25, r25
+ 20a:	0a 94       	dec	r0
+ 20c:	e2 f7       	brpl	.-8      	; 0x206 <_Z6PinOuthh+0x56>
+ 20e:	80 95       	com	r24
+ 210:	84 23       	and	r24, r20
+ 212:	80 83       	st	Z, r24
+ 214:	08 95       	ret
 
-0000023a <_Z5Servo9ServoName11ServoAction>:
+00000216 <_Z5Servo9ServoName11ServoAction>:
 };
 
 struct ActiveChann_TypeDef ActiveChann = {{0, 0, 0, 0, 0, 0, 0, 0}, 0, NUM_SERVO + 1};
 	
 void Servo(enum ServoName s, enum ServoAction a){
 	switch(a){
- 23a:	66 23       	and	r22, r22
- 23c:	19 f0       	breq	.+6      	; 0x244 <_Z5Servo9ServoName11ServoAction+0xa>
- 23e:	61 30       	cpi	r22, 0x01	; 1
- 240:	d1 f0       	breq	.+52     	; 0x276 <_Z5Servo9ServoName11ServoAction+0x3c>
- 242:	08 95       	ret
+ 216:	61 30       	cpi	r22, 0x01	; 1
+ 218:	e9 f0       	breq	.+58     	; 0x254 <_Z5Servo9ServoName11ServoAction+0x3e>
+ 21a:	18 f0       	brcs	.+6      	; 0x222 <_Z5Servo9ServoName11ServoAction+0xc>
+ 21c:	62 30       	cpi	r22, 0x02	; 2
+ 21e:	e1 f0       	breq	.+56     	; 0x258 <_Z5Servo9ServoName11ServoAction+0x42>
+ 220:	08 95       	ret
 	case Init:
 		// Set proper pins as outputs
 		*pinTab[(u8)s].DDR |= 1 << pinTab[(u8)s].p;
- 244:	97 e0       	ldi	r25, 0x07	; 7
- 246:	89 9f       	mul	r24, r25
- 248:	d0 01       	movw	r26, r0
- 24a:	11 24       	eor	r1, r1
- 24c:	a6 5e       	subi	r26, 0xE6	; 230
- 24e:	be 4f       	sbci	r27, 0xFE	; 254
- 250:	ed 91       	ld	r30, X+
- 252:	fc 91       	ld	r31, X
- 254:	11 97       	sbiw	r26, 0x01	; 1
- 256:	90 81       	ld	r25, Z
- 258:	41 e0       	ldi	r20, 0x01	; 1
- 25a:	50 e0       	ldi	r21, 0x00	; 0
- 25c:	9a 01       	movw	r18, r20
- 25e:	16 96       	adiw	r26, 0x06	; 6
- 260:	0c 90       	ld	r0, X
- 262:	02 c0       	rjmp	.+4      	; 0x268 <_Z5Servo9ServoName11ServoAction+0x2e>
- 264:	22 0f       	add	r18, r18
- 266:	33 1f       	adc	r19, r19
- 268:	0a 94       	dec	r0
- 26a:	e2 f7       	brpl	.-8      	; 0x264 <_Z5Servo9ServoName11ServoAction+0x2a>
- 26c:	29 2b       	or	r18, r25
- 26e:	20 83       	st	Z, r18
+ 222:	97 e0       	ldi	r25, 0x07	; 7
+ 224:	89 9f       	mul	r24, r25
+ 226:	d0 01       	movw	r26, r0
+ 228:	11 24       	eor	r1, r1
+ 22a:	a6 5e       	subi	r26, 0xE6	; 230
+ 22c:	be 4f       	sbci	r27, 0xFE	; 254
+ 22e:	ed 91       	ld	r30, X+
+ 230:	fc 91       	ld	r31, X
+ 232:	11 97       	sbiw	r26, 0x01	; 1
+ 234:	90 81       	ld	r25, Z
+ 236:	41 e0       	ldi	r20, 0x01	; 1
+ 238:	50 e0       	ldi	r21, 0x00	; 0
+ 23a:	9a 01       	movw	r18, r20
+ 23c:	16 96       	adiw	r26, 0x06	; 6
+ 23e:	0c 90       	ld	r0, X
+ 240:	02 c0       	rjmp	.+4      	; 0x246 <_Z5Servo9ServoName11ServoAction+0x30>
+ 242:	22 0f       	add	r18, r18
+ 244:	33 1f       	adc	r19, r19
+ 246:	0a 94       	dec	r0
+ 248:	e2 f7       	brpl	.-8      	; 0x242 <_Z5Servo9ServoName11ServoAction+0x2c>
+ 24a:	29 2b       	or	r18, r25
+ 24c:	20 83       	st	Z, r18
 		PinOut((u8)s, LOW);
- 270:	60 e0       	ldi	r22, 0x00	; 0
- 272:	b0 cf       	rjmp	.-160    	; 0x1d4 <_Z6PinOuthh>
+ 24e:	60 e0       	ldi	r22, 0x00	; 0
+ 250:	af cf       	rjmp	.-162    	; 0x1b0 <_Z6PinOuthh>
 		break;
- 274:	08 95       	ret
+ 252:	08 95       	ret
 	case EnablePWM:
 		PWM_AddChannel((u8)s);
- 276:	28 cf       	rjmp	.-432    	; 0xc8 <_Z14PWM_AddChannelh>
- 278:	08 95       	ret
+ 254:	39 cf       	rjmp	.-398    	; 0xc8 <_Z14PWM_AddChannelh>
+	    break;
+ 256:	08 95       	ret
+	case DisablePWM:
+		PWM_DeleteChannel((u8)s);
+ 258:	7f cf       	rjmp	.-258    	; 0x158 <_Z17PWM_DeleteChannelh>
+ 25a:	08 95       	ret
 
-0000027a <_Z18ATmega8_16bitTimerv>:
-volatile u16 calvar = SERVO_PWM_PERIOD_US / 2; // This var used for actuators calibration
-volatile u8 pwmCanBeChanged = 0;
-
-void ATmega8_16bitTimer(void)
-{
-	TCNT1 = 0xFFFF - SERVO_PWM_PERIOD_US;
- 27a:	8f ed       	ldi	r24, 0xDF	; 223
- 27c:	91 eb       	ldi	r25, 0xB1	; 177
- 27e:	9d bd       	out	0x2d, r25	; 45
- 280:	8c bd       	out	0x2c, r24	; 44
-	// Set timer clock to F_CPU / 8
-	TCCR1B = 0x02;
- 282:	82 e0       	ldi	r24, 0x02	; 2
- 284:	8e bd       	out	0x2e, r24	; 46
-	// Enable Overflow Interrupt
-	TIMSK |= 1 << TOIE1;
- 286:	87 b7       	in	r24, 0x37	; 55
- 288:	84 60       	ori	r24, 0x04	; 4
- 28a:	87 bf       	out	0x37, r24	; 55
- 28c:	08 95       	ret
-
-0000028e <__vector_14>:
+0000025c <_Z18ATmega8_16bitTimerv>:
+			}
+		}
+		_delay_ms(1);
+	}
+	return 0;
 }
+ 25c:	8f ed       	ldi	r24, 0xDF	; 223
+ 25e:	91 eb       	ldi	r25, 0xB1	; 177
+ 260:	9d bd       	out	0x2d, r25	; 45
+ 262:	8c bd       	out	0x2c, r24	; 44
+ 264:	82 e0       	ldi	r24, 0x02	; 2
+ 266:	8e bd       	out	0x2e, r24	; 46
+ 268:	87 b7       	in	r24, 0x37	; 55
+ 26a:	84 60       	ori	r24, 0x04	; 4
+ 26c:	87 bf       	out	0x37, r24	; 55
+ 26e:	08 95       	ret
 
-// ISR to deal with software PWM
-ISR(TIMER1_OVF_vect)
-{
- 28e:	1f 92       	push	r1
- 290:	0f 92       	push	r0
- 292:	0f b6       	in	r0, 0x3f	; 63
- 294:	0f 92       	push	r0
- 296:	11 24       	eor	r1, r1
- 298:	0b b6       	in	r0, 0x3b	; 59
- 29a:	0f 92       	push	r0
- 29c:	1f 93       	push	r17
- 29e:	2f 93       	push	r18
- 2a0:	3f 93       	push	r19
- 2a2:	4f 93       	push	r20
- 2a4:	5f 93       	push	r21
- 2a6:	6f 93       	push	r22
- 2a8:	7f 93       	push	r23
- 2aa:	8f 93       	push	r24
- 2ac:	9f 93       	push	r25
- 2ae:	af 93       	push	r26
- 2b0:	bf 93       	push	r27
- 2b2:	cf 93       	push	r28
- 2b4:	df 93       	push	r29
- 2b6:	ef 93       	push	r30
- 2b8:	ff 93       	push	r31
-	if( ActiveChann.Num > 0 ){
- 2ba:	80 91 08 01 	lds	r24, 0x0108
- 2be:	88 23       	and	r24, r24
- 2c0:	09 f4       	brne	.+2      	; 0x2c4 <__vector_14+0x36>
- 2c2:	70 c0       	rjmp	.+224    	; 0x3a4 <__vector_14+0x116>
-		if( ActiveChann.State == NUM_SERVO + 1 ){
- 2c4:	e0 91 09 01 	lds	r30, 0x0109
- 2c8:	e9 30       	cpi	r30, 0x09	; 9
- 2ca:	11 f5       	brne	.+68     	; 0x310 <__vector_14+0x82>
-				pwmCanBeChanged = 0;
- 2cc:	10 92 52 01 	sts	0x0152, r1
-				for( u8 i = 0; i < ActiveChann.Num; ++i ){
- 2d0:	88 23       	and	r24, r24
- 2d2:	71 f0       	breq	.+28     	; 0x2f0 <__vector_14+0x62>
- 2d4:	10 e0       	ldi	r17, 0x00	; 0
- 2d6:	c8 e0       	ldi	r28, 0x08	; 8
- 2d8:	d1 e0       	ldi	r29, 0x01	; 1
-					PinOut(ActiveChann.Tab[i], HIGH);
- 2da:	e1 2f       	mov	r30, r17
- 2dc:	f0 e0       	ldi	r31, 0x00	; 0
- 2de:	e0 50       	subi	r30, 0x00	; 0
- 2e0:	ff 4f       	sbci	r31, 0xFF	; 255
- 2e2:	61 e0       	ldi	r22, 0x01	; 1
+00000270 <__vector_14>:
+ 270:	1f 92       	push	r1
+ 272:	0f 92       	push	r0
+ 274:	0f b6       	in	r0, 0x3f	; 63
+ 276:	0f 92       	push	r0
+ 278:	11 24       	eor	r1, r1
+ 27a:	0b b6       	in	r0, 0x3b	; 59
+ 27c:	0f 92       	push	r0
+ 27e:	1f 93       	push	r17
+ 280:	2f 93       	push	r18
+ 282:	3f 93       	push	r19
+ 284:	4f 93       	push	r20
+ 286:	5f 93       	push	r21
+ 288:	6f 93       	push	r22
+ 28a:	7f 93       	push	r23
+ 28c:	8f 93       	push	r24
+ 28e:	9f 93       	push	r25
+ 290:	af 93       	push	r26
+ 292:	bf 93       	push	r27
+ 294:	cf 93       	push	r28
+ 296:	df 93       	push	r29
+ 298:	ef 93       	push	r30
+ 29a:	ff 93       	push	r31
+ 29c:	80 91 08 01 	lds	r24, 0x0108
+ 2a0:	88 23       	and	r24, r24
+ 2a2:	09 f4       	brne	.+2      	; 0x2a6 <__vector_14+0x36>
+ 2a4:	70 c0       	rjmp	.+224    	; 0x386 <__vector_14+0x116>
+ 2a6:	e0 91 09 01 	lds	r30, 0x0109
+ 2aa:	e9 30       	cpi	r30, 0x09	; 9
+ 2ac:	11 f5       	brne	.+68     	; 0x2f2 <__vector_14+0x82>
+ 2ae:	10 92 52 01 	sts	0x0152, r1
+ 2b2:	88 23       	and	r24, r24
+ 2b4:	71 f0       	breq	.+28     	; 0x2d2 <__vector_14+0x62>
+ 2b6:	10 e0       	ldi	r17, 0x00	; 0
+ 2b8:	c8 e0       	ldi	r28, 0x08	; 8
+ 2ba:	d1 e0       	ldi	r29, 0x01	; 1
+ 2bc:	e1 2f       	mov	r30, r17
+ 2be:	f0 e0       	ldi	r31, 0x00	; 0
+ 2c0:	e0 50       	subi	r30, 0x00	; 0
+ 2c2:	ff 4f       	sbci	r31, 0xFF	; 255
+ 2c4:	61 e0       	ldi	r22, 0x01	; 1
+ 2c6:	80 81       	ld	r24, Z
+ 2c8:	73 df       	rcall	.-282    	; 0x1b0 <_Z6PinOuthh>
+ 2ca:	1f 5f       	subi	r17, 0xFF	; 255
+ 2cc:	88 81       	ld	r24, Y
+ 2ce:	18 17       	cp	r17, r24
+ 2d0:	a8 f3       	brcs	.-22     	; 0x2bc <__vector_14+0x4c>
+ 2d2:	10 92 09 01 	sts	0x0109, r1
+ 2d6:	e0 91 00 01 	lds	r30, 0x0100
+ 2da:	f0 e0       	ldi	r31, 0x00	; 0
+ 2dc:	ee 0f       	add	r30, r30
+ 2de:	ff 1f       	adc	r31, r31
+ 2e0:	e6 5f       	subi	r30, 0xF6	; 246
+ 2e2:	fe 4f       	sbci	r31, 0xFE	; 254
  2e4:	80 81       	ld	r24, Z
- 2e6:	76 df       	rcall	.-276    	; 0x1d4 <_Z6PinOuthh>
-ISR(TIMER1_OVF_vect)
-{
-	if( ActiveChann.Num > 0 ){
-		if( ActiveChann.State == NUM_SERVO + 1 ){
-				pwmCanBeChanged = 0;
-				for( u8 i = 0; i < ActiveChann.Num; ++i ){
- 2e8:	1f 5f       	subi	r17, 0xFF	; 255
- 2ea:	88 81       	ld	r24, Y
- 2ec:	18 17       	cp	r17, r24
- 2ee:	a8 f3       	brcs	.-22     	; 0x2da <__vector_14+0x4c>
-					PinOut(ActiveChann.Tab[i], HIGH);
-				}
-				ActiveChann.State = 0;
- 2f0:	10 92 09 01 	sts	0x0109, r1
-				TCNT1 = 0xFFFF - pwmDutyTab[ActiveChann.Tab[0]];
- 2f4:	e0 91 00 01 	lds	r30, 0x0100
- 2f8:	f0 e0       	ldi	r31, 0x00	; 0
- 2fa:	ee 0f       	add	r30, r30
- 2fc:	ff 1f       	adc	r31, r31
- 2fe:	e6 5f       	subi	r30, 0xF6	; 246
- 300:	fe 4f       	sbci	r31, 0xFE	; 254
- 302:	80 81       	ld	r24, Z
- 304:	91 81       	ldd	r25, Z+1	; 0x01
- 306:	80 95       	com	r24
- 308:	90 95       	com	r25
- 30a:	9d bd       	out	0x2d, r25	; 45
- 30c:	8c bd       	out	0x2c, r24	; 44
- 30e:	4e c0       	rjmp	.+156    	; 0x3ac <__vector_14+0x11e>
-			}else{
-				PinOut(ActiveChann.Tab[ActiveChann.State], LOW);
- 310:	f0 e0       	ldi	r31, 0x00	; 0
- 312:	e0 50       	subi	r30, 0x00	; 0
- 314:	ff 4f       	sbci	r31, 0xFF	; 255
- 316:	60 e0       	ldi	r22, 0x00	; 0
- 318:	80 81       	ld	r24, Z
- 31a:	5c df       	rcall	.-328    	; 0x1d4 <_Z6PinOuthh>
-				
-				if( ActiveChann.State < ActiveChann.Num - 1 ){
- 31c:	80 91 09 01 	lds	r24, 0x0109
- 320:	90 e0       	ldi	r25, 0x00	; 0
- 322:	20 91 08 01 	lds	r18, 0x0108
- 326:	30 e0       	ldi	r19, 0x00	; 0
- 328:	21 50       	subi	r18, 0x01	; 1
- 32a:	31 09       	sbc	r19, r1
- 32c:	82 17       	cp	r24, r18
- 32e:	93 07       	cpc	r25, r19
- 330:	fc f4       	brge	.+62     	; 0x370 <__vector_14+0xe2>
-					TCNT1 = 0xFFFF - ( pwmDutyTab[ActiveChann.Tab[ActiveChann.State+1]] - pwmDutyTab[ActiveChann.Tab[ActiveChann.State]] );
- 332:	fc 01       	movw	r30, r24
- 334:	e0 50       	subi	r30, 0x00	; 0
- 336:	ff 4f       	sbci	r31, 0xFF	; 255
- 338:	a1 81       	ldd	r26, Z+1	; 0x01
- 33a:	b0 e0       	ldi	r27, 0x00	; 0
- 33c:	aa 0f       	add	r26, r26
- 33e:	bb 1f       	adc	r27, r27
- 340:	a6 5f       	subi	r26, 0xF6	; 246
- 342:	be 4f       	sbci	r27, 0xFE	; 254
- 344:	e0 81       	ld	r30, Z
- 346:	f0 e0       	ldi	r31, 0x00	; 0
- 348:	ee 0f       	add	r30, r30
- 34a:	ff 1f       	adc	r31, r31
- 34c:	e6 5f       	subi	r30, 0xF6	; 246
- 34e:	fe 4f       	sbci	r31, 0xFE	; 254
- 350:	8d 91       	ld	r24, X+
- 352:	9c 91       	ld	r25, X
- 354:	20 81       	ld	r18, Z
- 356:	31 81       	ldd	r19, Z+1	; 0x01
- 358:	82 1b       	sub	r24, r18
- 35a:	93 0b       	sbc	r25, r19
- 35c:	80 95       	com	r24
- 35e:	90 95       	com	r25
- 360:	9d bd       	out	0x2d, r25	; 45
- 362:	8c bd       	out	0x2c, r24	; 44
-					++ActiveChann.State;
- 364:	e9 e0       	ldi	r30, 0x09	; 9
- 366:	f1 e0       	ldi	r31, 0x01	; 1
- 368:	80 81       	ld	r24, Z
- 36a:	8f 5f       	subi	r24, 0xFF	; 255
- 36c:	80 83       	st	Z, r24
- 36e:	1e c0       	rjmp	.+60     	; 0x3ac <__vector_14+0x11e>
-					}else{
-					TCNT1 = 0xFFFF - ( SERVO_PWM_PERIOD_US - pwmDutyTab[ActiveChann.Tab[ActiveChann.State]] );
- 370:	fc 01       	movw	r30, r24
- 372:	e0 50       	subi	r30, 0x00	; 0
- 374:	ff 4f       	sbci	r31, 0xFF	; 255
- 376:	e0 81       	ld	r30, Z
- 378:	f0 e0       	ldi	r31, 0x00	; 0
- 37a:	ee 0f       	add	r30, r30
- 37c:	ff 1f       	adc	r31, r31
- 37e:	e6 5f       	subi	r30, 0xF6	; 246
- 380:	fe 4f       	sbci	r31, 0xFE	; 254
- 382:	20 81       	ld	r18, Z
- 384:	31 81       	ldd	r19, Z+1	; 0x01
- 386:	80 e2       	ldi	r24, 0x20	; 32
- 388:	9e e4       	ldi	r25, 0x4E	; 78
- 38a:	82 1b       	sub	r24, r18
- 38c:	93 0b       	sbc	r25, r19
- 38e:	80 95       	com	r24
- 390:	90 95       	com	r25
- 392:	9d bd       	out	0x2d, r25	; 45
- 394:	8c bd       	out	0x2c, r24	; 44
-					ActiveChann.State = NUM_SERVO + 1;
- 396:	89 e0       	ldi	r24, 0x09	; 9
- 398:	80 93 09 01 	sts	0x0109, r24
-					pwmCanBeChanged = 1;
- 39c:	81 e0       	ldi	r24, 0x01	; 1
- 39e:	80 93 52 01 	sts	0x0152, r24
- 3a2:	04 c0       	rjmp	.+8      	; 0x3ac <__vector_14+0x11e>
-				}
-			}
-		}else{
-			TCNT1 = 0xFFFF - SERVO_PWM_PERIOD_US;
- 3a4:	8f ed       	ldi	r24, 0xDF	; 223
- 3a6:	91 eb       	ldi	r25, 0xB1	; 177
- 3a8:	9d bd       	out	0x2d, r25	; 45
- 3aa:	8c bd       	out	0x2c, r24	; 44
-		}
-}
- 3ac:	ff 91       	pop	r31
- 3ae:	ef 91       	pop	r30
- 3b0:	df 91       	pop	r29
- 3b2:	cf 91       	pop	r28
- 3b4:	bf 91       	pop	r27
- 3b6:	af 91       	pop	r26
- 3b8:	9f 91       	pop	r25
- 3ba:	8f 91       	pop	r24
- 3bc:	7f 91       	pop	r23
- 3be:	6f 91       	pop	r22
- 3c0:	5f 91       	pop	r21
- 3c2:	4f 91       	pop	r20
- 3c4:	3f 91       	pop	r19
- 3c6:	2f 91       	pop	r18
- 3c8:	1f 91       	pop	r17
- 3ca:	0f 90       	pop	r0
- 3cc:	0b be       	out	0x3b, r0	; 59
- 3ce:	0f 90       	pop	r0
- 3d0:	0f be       	out	0x3f, r0	; 63
- 3d2:	0f 90       	pop	r0
- 3d4:	1f 90       	pop	r1
- 3d6:	18 95       	reti
+ 2e6:	91 81       	ldd	r25, Z+1	; 0x01
+ 2e8:	80 95       	com	r24
+ 2ea:	90 95       	com	r25
+ 2ec:	9d bd       	out	0x2d, r25	; 45
+ 2ee:	8c bd       	out	0x2c, r24	; 44
+ 2f0:	4e c0       	rjmp	.+156    	; 0x38e <__vector_14+0x11e>
+ 2f2:	f0 e0       	ldi	r31, 0x00	; 0
+ 2f4:	e0 50       	subi	r30, 0x00	; 0
+ 2f6:	ff 4f       	sbci	r31, 0xFF	; 255
+ 2f8:	60 e0       	ldi	r22, 0x00	; 0
+ 2fa:	80 81       	ld	r24, Z
+ 2fc:	59 df       	rcall	.-334    	; 0x1b0 <_Z6PinOuthh>
+ 2fe:	80 91 09 01 	lds	r24, 0x0109
+ 302:	90 e0       	ldi	r25, 0x00	; 0
+ 304:	20 91 08 01 	lds	r18, 0x0108
+ 308:	30 e0       	ldi	r19, 0x00	; 0
+ 30a:	21 50       	subi	r18, 0x01	; 1
+ 30c:	31 09       	sbc	r19, r1
+ 30e:	82 17       	cp	r24, r18
+ 310:	93 07       	cpc	r25, r19
+ 312:	fc f4       	brge	.+62     	; 0x352 <__vector_14+0xe2>
+ 314:	fc 01       	movw	r30, r24
+ 316:	e0 50       	subi	r30, 0x00	; 0
+ 318:	ff 4f       	sbci	r31, 0xFF	; 255
+ 31a:	a1 81       	ldd	r26, Z+1	; 0x01
+ 31c:	b0 e0       	ldi	r27, 0x00	; 0
+ 31e:	aa 0f       	add	r26, r26
+ 320:	bb 1f       	adc	r27, r27
+ 322:	a6 5f       	subi	r26, 0xF6	; 246
+ 324:	be 4f       	sbci	r27, 0xFE	; 254
+ 326:	e0 81       	ld	r30, Z
+ 328:	f0 e0       	ldi	r31, 0x00	; 0
+ 32a:	ee 0f       	add	r30, r30
+ 32c:	ff 1f       	adc	r31, r31
+ 32e:	e6 5f       	subi	r30, 0xF6	; 246
+ 330:	fe 4f       	sbci	r31, 0xFE	; 254
+ 332:	8d 91       	ld	r24, X+
+ 334:	9c 91       	ld	r25, X
+ 336:	20 81       	ld	r18, Z
+ 338:	31 81       	ldd	r19, Z+1	; 0x01
+ 33a:	82 1b       	sub	r24, r18
+ 33c:	93 0b       	sbc	r25, r19
+ 33e:	80 95       	com	r24
+ 340:	90 95       	com	r25
+ 342:	9d bd       	out	0x2d, r25	; 45
+ 344:	8c bd       	out	0x2c, r24	; 44
+ 346:	e9 e0       	ldi	r30, 0x09	; 9
+ 348:	f1 e0       	ldi	r31, 0x01	; 1
+ 34a:	80 81       	ld	r24, Z
+ 34c:	8f 5f       	subi	r24, 0xFF	; 255
+ 34e:	80 83       	st	Z, r24
+ 350:	1e c0       	rjmp	.+60     	; 0x38e <__vector_14+0x11e>
+ 352:	fc 01       	movw	r30, r24
+ 354:	e0 50       	subi	r30, 0x00	; 0
+ 356:	ff 4f       	sbci	r31, 0xFF	; 255
+ 358:	e0 81       	ld	r30, Z
+ 35a:	f0 e0       	ldi	r31, 0x00	; 0
+ 35c:	ee 0f       	add	r30, r30
+ 35e:	ff 1f       	adc	r31, r31
+ 360:	e6 5f       	subi	r30, 0xF6	; 246
+ 362:	fe 4f       	sbci	r31, 0xFE	; 254
+ 364:	20 81       	ld	r18, Z
+ 366:	31 81       	ldd	r19, Z+1	; 0x01
+ 368:	80 e2       	ldi	r24, 0x20	; 32
+ 36a:	9e e4       	ldi	r25, 0x4E	; 78
+ 36c:	82 1b       	sub	r24, r18
+ 36e:	93 0b       	sbc	r25, r19
+ 370:	80 95       	com	r24
+ 372:	90 95       	com	r25
+ 374:	9d bd       	out	0x2d, r25	; 45
+ 376:	8c bd       	out	0x2c, r24	; 44
+ 378:	89 e0       	ldi	r24, 0x09	; 9
+ 37a:	80 93 09 01 	sts	0x0109, r24
+ 37e:	81 e0       	ldi	r24, 0x01	; 1
+ 380:	80 93 52 01 	sts	0x0152, r24
+ 384:	04 c0       	rjmp	.+8      	; 0x38e <__vector_14+0x11e>
+ 386:	8f ed       	ldi	r24, 0xDF	; 223
+ 388:	91 eb       	ldi	r25, 0xB1	; 177
+ 38a:	9d bd       	out	0x2d, r25	; 45
+ 38c:	8c bd       	out	0x2c, r24	; 44
+ 38e:	ff 91       	pop	r31
+ 390:	ef 91       	pop	r30
+ 392:	df 91       	pop	r29
+ 394:	cf 91       	pop	r28
+ 396:	bf 91       	pop	r27
+ 398:	af 91       	pop	r26
+ 39a:	9f 91       	pop	r25
+ 39c:	8f 91       	pop	r24
+ 39e:	7f 91       	pop	r23
+ 3a0:	6f 91       	pop	r22
+ 3a2:	5f 91       	pop	r21
+ 3a4:	4f 91       	pop	r20
+ 3a6:	3f 91       	pop	r19
+ 3a8:	2f 91       	pop	r18
+ 3aa:	1f 91       	pop	r17
+ 3ac:	0f 90       	pop	r0
+ 3ae:	0b be       	out	0x3b, r0	; 59
+ 3b0:	0f 90       	pop	r0
+ 3b2:	0f be       	out	0x3f, r0	; 63
+ 3b4:	0f 90       	pop	r0
+ 3b6:	1f 90       	pop	r1
+ 3b8:	18 95       	reti
 
-000003d8 <_Z7pollingPVhh>:
-
-u8 polling(volatile u8 *reg, u8 bitno){
- 3d8:	ef 92       	push	r14
- 3da:	ff 92       	push	r15
- 3dc:	0f 93       	push	r16
- 3de:	1f 93       	push	r17
- 3e0:	cf 93       	push	r28
- 3e2:	df 93       	push	r29
- 3e4:	fc 01       	movw	r30, r24
-	u16 cntr = 0, dcntr;
-	while(*reg & 1 << bitno){
- 3e6:	80 81       	ld	r24, Z
- 3e8:	90 e0       	ldi	r25, 0x00	; 0
- 3ea:	06 2e       	mov	r0, r22
- 3ec:	02 c0       	rjmp	.+4      	; 0x3f2 <_Z7pollingPVhh+0x1a>
- 3ee:	95 95       	asr	r25
- 3f0:	87 95       	ror	r24
- 3f2:	0a 94       	dec	r0
- 3f4:	e2 f7       	brpl	.-8      	; 0x3ee <_Z7pollingPVhh+0x16>
- 3f6:	80 ff       	sbrs	r24, 0
- 3f8:	b3 c0       	rjmp	.+358    	; 0x560 <_Z7pollingPVhh+0x188>
- 3fa:	81 e0       	ldi	r24, 0x01	; 1
- 3fc:	90 e0       	ldi	r25, 0x00	; 0
- 3fe:	9c 01       	movw	r18, r24
- 400:	02 c0       	rjmp	.+4      	; 0x406 <_Z7pollingPVhh+0x2e>
- 402:	22 0f       	add	r18, r18
- 404:	33 1f       	adc	r19, r19
- 406:	6a 95       	dec	r22
- 408:	e2 f7       	brpl	.-8      	; 0x402 <_Z7pollingPVhh+0x2a>
- 40a:	b9 01       	movw	r22, r18
-		if(cntr++ > DEBOUNCE_DELAY){
- 40c:	21 e0       	ldi	r18, 0x01	; 1
- 40e:	30 e0       	ldi	r19, 0x00	; 0
- 410:	d4 ef       	ldi	r29, 0xF4	; 244
- 412:	c1 e0       	ldi	r28, 0x01	; 1
-			// Wait until the button released
-			dcntr = 0;
-			while(dcntr++ < DOUBLECLICK_DELAY){
-				cntr = 0;
-				while(!(*reg & 1 << bitno)){
-					if(cntr++ > DEBOUNCE_DELAY){
- 414:	b1 e0       	ldi	r27, 0x01	; 1
- 416:	a0 e0       	ldi	r26, 0x00	; 0
-		if(cntr++ > DEBOUNCE_DELAY){
-			// Wait until the button released
-			dcntr = 0;
-			while(dcntr++ < DOUBLECLICK_DELAY){
-				cntr = 0;
-				while(!(*reg & 1 << bitno)){
- 418:	00 e0       	ldi	r16, 0x00	; 0
- 41a:	10 e0       	ldi	r17, 0x00	; 0
- 41c:	92 c0       	rjmp	.+292    	; 0x542 <_Z7pollingPVhh+0x16a>
-}
-
-u8 polling(volatile u8 *reg, u8 bitno){
-	u16 cntr = 0, dcntr;
-	while(*reg & 1 << bitno){
-		if(cntr++ > DEBOUNCE_DELAY){
- 41e:	2b 30       	cpi	r18, 0x0B	; 11
- 420:	31 05       	cpc	r19, r1
- 422:	08 f4       	brcc	.+2      	; 0x426 <_Z7pollingPVhh+0x4e>
- 424:	8c c0       	rjmp	.+280    	; 0x53e <_Z7pollingPVhh+0x166>
- 426:	4d 2f       	mov	r20, r29
- 428:	5c 2f       	mov	r21, r28
- 42a:	80 c0       	rjmp	.+256    	; 0x52c <_Z7pollingPVhh+0x154>
-			// Wait until the button released
-			dcntr = 0;
-			while(dcntr++ < DOUBLECLICK_DELAY){
-				cntr = 0;
-				while(!(*reg & 1 << bitno)){
-					if(cntr++ > DEBOUNCE_DELAY){
- 42c:	2f 5f       	subi	r18, 0xFF	; 255
- 42e:	3f 4f       	sbci	r19, 0xFF	; 255
- 430:	2c 30       	cpi	r18, 0x0C	; 12
- 432:	31 05       	cpc	r19, r1
- 434:	09 f0       	breq	.+2      	; 0x438 <_Z7pollingPVhh+0x60>
- 436:	5f c0       	rjmp	.+190    	; 0x4f6 <_Z7pollingPVhh+0x11e>
-						// Wait for the second click
-						dcntr = 0;
-						while(dcntr++ < DOUBLECLICK_DELAY){
- 438:	41 e0       	ldi	r20, 0x01	; 1
- 43a:	50 e0       	ldi	r21, 0x00	; 0
-							cntr = 0;
-							while(*reg & 1 << bitno){
-								if(cntr++ > DEBOUNCE_DELAY){
- 43c:	b1 e0       	ldi	r27, 0x01	; 1
- 43e:	a0 e0       	ldi	r26, 0x00	; 0
-									// So the second click happened
-									dcntr = 0;
-									while(dcntr++ < DOUBLECLICK_DELAY){
-										cntr = 0;
-										while(!(*reg & 1 << bitno)){
-											if(cntr++ > DEBOUNCE_DELAY){
- 440:	0b 2f       	mov	r16, r27
- 442:	1a 2f       	mov	r17, r26
- 444:	db 2f       	mov	r29, r27
- 446:	ca 2f       	mov	r28, r26
-								if(cntr++ > DEBOUNCE_DELAY){
-									// So the second click happened
-									dcntr = 0;
-									while(dcntr++ < DOUBLECLICK_DELAY){
-										cntr = 0;
-										while(!(*reg & 1 << bitno)){
- 448:	e1 2c       	mov	r14, r1
- 44a:	f1 2c       	mov	r15, r1
- 44c:	4b c0       	rjmp	.+150    	; 0x4e4 <_Z7pollingPVhh+0x10c>
-						// Wait for the second click
-						dcntr = 0;
-						while(dcntr++ < DOUBLECLICK_DELAY){
-							cntr = 0;
-							while(*reg & 1 << bitno){
-								if(cntr++ > DEBOUNCE_DELAY){
- 44e:	2b 30       	cpi	r18, 0x0B	; 11
- 450:	31 05       	cpc	r19, r1
- 452:	68 f1       	brcs	.+90     	; 0x4ae <_Z7pollingPVhh+0xd6>
-									// So the second click happened
-									dcntr = 0;
-									while(dcntr++ < DOUBLECLICK_DELAY){
- 454:	40 2f       	mov	r20, r16
- 456:	51 2f       	mov	r21, r17
- 458:	21 c0       	rjmp	.+66     	; 0x49c <_Z7pollingPVhh+0xc4>
-										cntr = 0;
-										while(!(*reg & 1 << bitno)){
-											if(cntr++ > DEBOUNCE_DELAY){
- 45a:	2f 5f       	subi	r18, 0xFF	; 255
- 45c:	3f 4f       	sbci	r19, 0xFF	; 255
- 45e:	2c 30       	cpi	r18, 0x0C	; 12
- 460:	31 05       	cpc	r19, r1
- 462:	09 f4       	brne	.+2      	; 0x466 <_Z7pollingPVhh+0x8e>
- 464:	7f c0       	rjmp	.+254    	; 0x564 <_Z7pollingPVhh+0x18c>
-	#else
-		//round up by default
-		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
-	#endif
-
-	__builtin_avr_delay_cycles(__ticks_dc);
- 466:	8f ec       	ldi	r24, 0xCF	; 207
- 468:	97 e0       	ldi	r25, 0x07	; 7
- 46a:	01 97       	sbiw	r24, 0x01	; 1
- 46c:	f1 f7       	brne	.-4      	; 0x46a <_Z7pollingPVhh+0x92>
- 46e:	00 c0       	rjmp	.+0      	; 0x470 <_Z7pollingPVhh+0x98>
- 470:	00 00       	nop
-								if(cntr++ > DEBOUNCE_DELAY){
-									// So the second click happened
-									dcntr = 0;
-									while(dcntr++ < DOUBLECLICK_DELAY){
-										cntr = 0;
-										while(!(*reg & 1 << bitno)){
- 472:	80 81       	ld	r24, Z
- 474:	90 e0       	ldi	r25, 0x00	; 0
- 476:	86 23       	and	r24, r22
- 478:	97 23       	and	r25, r23
- 47a:	89 2b       	or	r24, r25
- 47c:	71 f3       	breq	.-36     	; 0x45a <_Z7pollingPVhh+0x82>
- 47e:	02 c0       	rjmp	.+4      	; 0x484 <_Z7pollingPVhh+0xac>
- 480:	2e 2d       	mov	r18, r14
- 482:	3f 2d       	mov	r19, r15
- 484:	8f ec       	ldi	r24, 0xCF	; 207
- 486:	97 e0       	ldi	r25, 0x07	; 7
- 488:	01 97       	sbiw	r24, 0x01	; 1
- 48a:	f1 f7       	brne	.-4      	; 0x488 <_Z7pollingPVhh+0xb0>
- 48c:	00 c0       	rjmp	.+0      	; 0x48e <_Z7pollingPVhh+0xb6>
- 48e:	00 00       	nop
-							cntr = 0;
-							while(*reg & 1 << bitno){
-								if(cntr++ > DEBOUNCE_DELAY){
-									// So the second click happened
-									dcntr = 0;
-									while(dcntr++ < DOUBLECLICK_DELAY){
- 490:	4f 5f       	subi	r20, 0xFF	; 255
- 492:	5f 4f       	sbci	r21, 0xFF	; 255
- 494:	45 3f       	cpi	r20, 0xF5	; 245
- 496:	91 e0       	ldi	r25, 0x01	; 1
- 498:	59 07       	cpc	r21, r25
- 49a:	59 f0       	breq	.+22     	; 0x4b2 <_Z7pollingPVhh+0xda>
-										cntr = 0;
-										while(!(*reg & 1 << bitno)){
- 49c:	80 81       	ld	r24, Z
- 49e:	90 e0       	ldi	r25, 0x00	; 0
- 4a0:	86 23       	and	r24, r22
- 4a2:	97 23       	and	r25, r23
- 4a4:	89 2b       	or	r24, r25
- 4a6:	61 f7       	brne	.-40     	; 0x480 <_Z7pollingPVhh+0xa8>
-											if(cntr++ > DEBOUNCE_DELAY){
- 4a8:	2d 2f       	mov	r18, r29
- 4aa:	3c 2f       	mov	r19, r28
- 4ac:	dc cf       	rjmp	.-72     	; 0x466 <_Z7pollingPVhh+0x8e>
-						// Wait for the second click
-						dcntr = 0;
-						while(dcntr++ < DOUBLECLICK_DELAY){
-							cntr = 0;
-							while(*reg & 1 << bitno){
-								if(cntr++ > DEBOUNCE_DELAY){
- 4ae:	2f 5f       	subi	r18, 0xFF	; 255
- 4b0:	3f 4f       	sbci	r19, 0xFF	; 255
- 4b2:	8f ec       	ldi	r24, 0xCF	; 207
- 4b4:	97 e0       	ldi	r25, 0x07	; 7
- 4b6:	01 97       	sbiw	r24, 0x01	; 1
- 4b8:	f1 f7       	brne	.-4      	; 0x4b6 <_Z7pollingPVhh+0xde>
- 4ba:	00 c0       	rjmp	.+0      	; 0x4bc <_Z7pollingPVhh+0xe4>
- 4bc:	00 00       	nop
-					if(cntr++ > DEBOUNCE_DELAY){
-						// Wait for the second click
-						dcntr = 0;
-						while(dcntr++ < DOUBLECLICK_DELAY){
-							cntr = 0;
-							while(*reg & 1 << bitno){
- 4be:	80 81       	ld	r24, Z
- 4c0:	90 e0       	ldi	r25, 0x00	; 0
- 4c2:	86 23       	and	r24, r22
- 4c4:	97 23       	and	r25, r23
- 4c6:	89 2b       	or	r24, r25
- 4c8:	11 f6       	brne	.-124    	; 0x44e <_Z7pollingPVhh+0x76>
- 4ca:	8f ec       	ldi	r24, 0xCF	; 207
- 4cc:	97 e0       	ldi	r25, 0x07	; 7
- 4ce:	01 97       	sbiw	r24, 0x01	; 1
- 4d0:	f1 f7       	brne	.-4      	; 0x4ce <_Z7pollingPVhh+0xf6>
- 4d2:	00 c0       	rjmp	.+0      	; 0x4d4 <_Z7pollingPVhh+0xfc>
- 4d4:	00 00       	nop
-				cntr = 0;
-				while(!(*reg & 1 << bitno)){
-					if(cntr++ > DEBOUNCE_DELAY){
-						// Wait for the second click
-						dcntr = 0;
-						while(dcntr++ < DOUBLECLICK_DELAY){
- 4d6:	ca 01       	movw	r24, r20
- 4d8:	01 96       	adiw	r24, 0x01	; 1
- 4da:	44 3f       	cpi	r20, 0xF4	; 244
- 4dc:	51 40       	sbci	r21, 0x01	; 1
- 4de:	08 f0       	brcs	.+2      	; 0x4e2 <_Z7pollingPVhh+0x10a>
- 4e0:	43 c0       	rjmp	.+134    	; 0x568 <_Z7pollingPVhh+0x190>
- 4e2:	ac 01       	movw	r20, r24
-							cntr = 0;
-							while(*reg & 1 << bitno){
- 4e4:	80 81       	ld	r24, Z
- 4e6:	90 e0       	ldi	r25, 0x00	; 0
- 4e8:	86 23       	and	r24, r22
- 4ea:	97 23       	and	r25, r23
- 4ec:	89 2b       	or	r24, r25
- 4ee:	69 f3       	breq	.-38     	; 0x4ca <_Z7pollingPVhh+0xf2>
-								if(cntr++ > DEBOUNCE_DELAY){
- 4f0:	2b 2f       	mov	r18, r27
- 4f2:	3a 2f       	mov	r19, r26
- 4f4:	de cf       	rjmp	.-68     	; 0x4b2 <_Z7pollingPVhh+0xda>
- 4f6:	8f ec       	ldi	r24, 0xCF	; 207
- 4f8:	97 e0       	ldi	r25, 0x07	; 7
- 4fa:	01 97       	sbiw	r24, 0x01	; 1
- 4fc:	f1 f7       	brne	.-4      	; 0x4fa <_Z7pollingPVhh+0x122>
- 4fe:	00 c0       	rjmp	.+0      	; 0x500 <_Z7pollingPVhh+0x128>
- 500:	00 00       	nop
-		if(cntr++ > DEBOUNCE_DELAY){
-			// Wait until the button released
-			dcntr = 0;
-			while(dcntr++ < DOUBLECLICK_DELAY){
-				cntr = 0;
-				while(!(*reg & 1 << bitno)){
- 502:	80 81       	ld	r24, Z
- 504:	90 e0       	ldi	r25, 0x00	; 0
- 506:	86 23       	and	r24, r22
- 508:	97 23       	and	r25, r23
- 50a:	89 2b       	or	r24, r25
- 50c:	09 f4       	brne	.+2      	; 0x510 <_Z7pollingPVhh+0x138>
- 50e:	8e cf       	rjmp	.-228    	; 0x42c <_Z7pollingPVhh+0x54>
- 510:	02 c0       	rjmp	.+4      	; 0x516 <_Z7pollingPVhh+0x13e>
- 512:	20 2f       	mov	r18, r16
- 514:	31 2f       	mov	r19, r17
- 516:	8f ec       	ldi	r24, 0xCF	; 207
- 518:	97 e0       	ldi	r25, 0x07	; 7
- 51a:	01 97       	sbiw	r24, 0x01	; 1
- 51c:	f1 f7       	brne	.-4      	; 0x51a <_Z7pollingPVhh+0x142>
- 51e:	00 c0       	rjmp	.+0      	; 0x520 <_Z7pollingPVhh+0x148>
- 520:	00 00       	nop
- 522:	41 50       	subi	r20, 0x01	; 1
- 524:	51 09       	sbc	r21, r1
-	u16 cntr = 0, dcntr;
-	while(*reg & 1 << bitno){
-		if(cntr++ > DEBOUNCE_DELAY){
-			// Wait until the button released
-			dcntr = 0;
-			while(dcntr++ < DOUBLECLICK_DELAY){
- 526:	41 15       	cp	r20, r1
- 528:	51 05       	cpc	r21, r1
- 52a:	59 f0       	breq	.+22     	; 0x542 <_Z7pollingPVhh+0x16a>
-				cntr = 0;
-				while(!(*reg & 1 << bitno)){
- 52c:	80 81       	ld	r24, Z
- 52e:	90 e0       	ldi	r25, 0x00	; 0
- 530:	86 23       	and	r24, r22
- 532:	97 23       	and	r25, r23
- 534:	89 2b       	or	r24, r25
- 536:	69 f7       	brne	.-38     	; 0x512 <_Z7pollingPVhh+0x13a>
-					if(cntr++ > DEBOUNCE_DELAY){
- 538:	2b 2f       	mov	r18, r27
- 53a:	3a 2f       	mov	r19, r26
- 53c:	dc cf       	rjmp	.-72     	; 0x4f6 <_Z7pollingPVhh+0x11e>
-}
-
-u8 polling(volatile u8 *reg, u8 bitno){
-	u16 cntr = 0, dcntr;
-	while(*reg & 1 << bitno){
-		if(cntr++ > DEBOUNCE_DELAY){
- 53e:	2f 5f       	subi	r18, 0xFF	; 255
- 540:	3f 4f       	sbci	r19, 0xFF	; 255
- 542:	8f ec       	ldi	r24, 0xCF	; 207
- 544:	97 e0       	ldi	r25, 0x07	; 7
- 546:	01 97       	sbiw	r24, 0x01	; 1
- 548:	f1 f7       	brne	.-4      	; 0x546 <_Z7pollingPVhh+0x16e>
- 54a:	00 c0       	rjmp	.+0      	; 0x54c <_Z7pollingPVhh+0x174>
- 54c:	00 00       	nop
-		}
-}
-
-u8 polling(volatile u8 *reg, u8 bitno){
-	u16 cntr = 0, dcntr;
-	while(*reg & 1 << bitno){
- 54e:	80 81       	ld	r24, Z
- 550:	90 e0       	ldi	r25, 0x00	; 0
- 552:	86 23       	and	r24, r22
- 554:	97 23       	and	r25, r23
- 556:	89 2b       	or	r24, r25
- 558:	09 f0       	breq	.+2      	; 0x55c <_Z7pollingPVhh+0x184>
- 55a:	61 cf       	rjmp	.-318    	; 0x41e <_Z7pollingPVhh+0x46>
-				_delay_ms(1);
-			}
-		}
-		_delay_ms(1);
-	}
-	return 0;
- 55c:	80 e0       	ldi	r24, 0x00	; 0
- 55e:	05 c0       	rjmp	.+10     	; 0x56a <_Z7pollingPVhh+0x192>
- 560:	80 e0       	ldi	r24, 0x00	; 0
- 562:	03 c0       	rjmp	.+6      	; 0x56a <_Z7pollingPVhh+0x192>
-									dcntr = 0;
-									while(dcntr++ < DOUBLECLICK_DELAY){
-										cntr = 0;
-										while(!(*reg & 1 << bitno)){
-											if(cntr++ > DEBOUNCE_DELAY){
-												return 2;
- 564:	82 e0       	ldi	r24, 0x02	; 2
- 566:	01 c0       	rjmp	.+2      	; 0x56a <_Z7pollingPVhh+0x192>
-								_delay_ms(1);
-							}
-							_delay_ms(1);
-						}
-						// So there was only one click
-						return 1;
- 568:	81 e0       	ldi	r24, 0x01	; 1
-			}
-		}
-		_delay_ms(1);
-	}
-	return 0;
-}
- 56a:	df 91       	pop	r29
- 56c:	cf 91       	pop	r28
- 56e:	1f 91       	pop	r17
- 570:	0f 91       	pop	r16
- 572:	ff 90       	pop	r15
- 574:	ef 90       	pop	r14
- 576:	08 95       	ret
-
-00000578 <main>:
+000003ba <main>:
 
 int main(void)
 {
 	SP = 0xFFF;
- 578:	8f ef       	ldi	r24, 0xFF	; 255
- 57a:	9f e0       	ldi	r25, 0x0F	; 15
- 57c:	9e bf       	out	0x3e, r25	; 62
- 57e:	8d bf       	out	0x3d, r24	; 61
+ 3ba:	8f ef       	ldi	r24, 0xFF	; 255
+ 3bc:	9f e0       	ldi	r25, 0x0F	; 15
+ 3be:	9e bf       	out	0x3e, r25	; 62
+ 3c0:	8d bf       	out	0x3d, r24	; 61
+	
+	PING &= ~0x07;
+ 3c2:	e3 e6       	ldi	r30, 0x63	; 99
+ 3c4:	f0 e0       	ldi	r31, 0x00	; 0
+ 3c6:	80 81       	ld	r24, Z
+ 3c8:	88 7f       	andi	r24, 0xF8	; 248
+ 3ca:	80 83       	st	Z, r24
 	
 	Servo(CanSat1, Init);
- 580:	60 e0       	ldi	r22, 0x00	; 0
- 582:	80 e0       	ldi	r24, 0x00	; 0
- 584:	5a de       	rcall	.-844    	; 0x23a <_Z5Servo9ServoName11ServoAction>
-	Servo(CanSat1, EnablePWM);
- 586:	61 e0       	ldi	r22, 0x01	; 1
- 588:	80 e0       	ldi	r24, 0x00	; 0
- 58a:	57 de       	rcall	.-850    	; 0x23a <_Z5Servo9ServoName11ServoAction>
+ 3cc:	60 e0       	ldi	r22, 0x00	; 0
+ 3ce:	80 e0       	ldi	r24, 0x00	; 0
+ 3d0:	22 df       	rcall	.-444    	; 0x216 <_Z5Servo9ServoName11ServoAction>
+	Servo(CanSat2, Init);
+ 3d2:	60 e0       	ldi	r22, 0x00	; 0
+ 3d4:	81 e0       	ldi	r24, 0x01	; 1
+ 3d6:	1f df       	rcall	.-450    	; 0x216 <_Z5Servo9ServoName11ServoAction>
+	Servo(CanSat3, Init);
+ 3d8:	60 e0       	ldi	r22, 0x00	; 0
+ 3da:	82 e0       	ldi	r24, 0x02	; 2
+ 3dc:	1c df       	rcall	.-456    	; 0x216 <_Z5Servo9ServoName11ServoAction>
+	Servo(Parachute, Init);
+ 3de:	60 e0       	ldi	r22, 0x00	; 0
+ 3e0:	83 e0       	ldi	r24, 0x03	; 3
+ 3e2:	19 df       	rcall	.-462    	; 0x216 <_Z5Servo9ServoName11ServoAction>
+	Servo(CanSatsHatchLock, Init);
+ 3e4:	60 e0       	ldi	r22, 0x00	; 0
+ 3e6:	84 e0       	ldi	r24, 0x04	; 4
+ 3e8:	16 df       	rcall	.-468    	; 0x216 <_Z5Servo9ServoName11ServoAction>
+	Servo(ParachuteHatchLock, Init);
+ 3ea:	60 e0       	ldi	r22, 0x00	; 0
+ 3ec:	85 e0       	ldi	r24, 0x05	; 5
+ 3ee:	13 df       	rcall	.-474    	; 0x216 <_Z5Servo9ServoName11ServoAction>
+	Servo(CanSatHatchOpening, Init);
+ 3f0:	60 e0       	ldi	r22, 0x00	; 0
+ 3f2:	86 e0       	ldi	r24, 0x06	; 6
+ 3f4:	10 df       	rcall	.-480    	; 0x216 <_Z5Servo9ServoName11ServoAction>
+	Servo(Fins, Init);
+ 3f6:	60 e0       	ldi	r22, 0x00	; 0
+ 3f8:	87 e0       	ldi	r24, 0x07	; 7
+ 3fa:	0d df       	rcall	.-486    	; 0x216 <_Z5Servo9ServoName11ServoAction>
+	
 	ATmega8_16bitTimer();
- 58c:	76 de       	rcall	.-788    	; 0x27a <_Z18ATmega8_16bitTimerv>
+ 3fc:	2f df       	rcall	.-418    	; 0x25c <_Z18ATmega8_16bitTimerv>
 	sei();
- 58e:	78 94       	sei
-	while(1){
-		u8 retval = polling(&PINB, 1);
- 590:	61 e0       	ldi	r22, 0x01	; 1
- 592:	86 e3       	ldi	r24, 0x36	; 54
- 594:	90 e0       	ldi	r25, 0x00	; 0
- 596:	20 df       	rcall	.-448    	; 0x3d8 <_Z7pollingPVhh>
-		if(retval == 1){
- 598:	81 30       	cpi	r24, 0x01	; 1
- 59a:	29 f4       	brne	.+10     	; 0x5a6 <main+0x2e>
-			Servo_ChangeDuty(CanSat1, 18000);
- 59c:	60 e5       	ldi	r22, 0x50	; 80
- 59e:	76 e4       	ldi	r23, 0x46	; 70
- 5a0:	80 e0       	ldi	r24, 0x00	; 0
- 5a2:	da dd       	rcall	.-1100   	; 0x158 <_Z16Servo_ChangeDuty9ServoNamet>
- 5a4:	f5 cf       	rjmp	.-22     	; 0x590 <main+0x18>
-		}else
-		if(retval == 2){
- 5a6:	82 30       	cpi	r24, 0x02	; 2
- 5a8:	99 f7       	brne	.-26     	; 0x590 <main+0x18>
-			Servo_ChangeDuty(CanSat1, 19000);
- 5aa:	68 e3       	ldi	r22, 0x38	; 56
- 5ac:	7a e4       	ldi	r23, 0x4A	; 74
- 5ae:	80 e0       	ldi	r24, 0x00	; 0
- 5b0:	d3 dd       	rcall	.-1114   	; 0x158 <_Z16Servo_ChangeDuty9ServoNamet>
- 5b2:	ee cf       	rjmp	.-36     	; 0x590 <main+0x18>
+ 3fe:	78 94       	sei
+		pwmDutyTab[acn] = calvar;
+		_delay_ms(10);
+	}*/
+	
+	//BUTTONS_INIT; // Init buttons
+	Servo(Fins, EnablePWM);
+ 400:	61 e0       	ldi	r22, 0x01	; 1
+ 402:	87 e0       	ldi	r24, 0x07	; 7
+ 404:	08 df       	rcall	.-496    	; 0x216 <_Z5Servo9ServoName11ServoAction>
+ 406:	ff cf       	rjmp	.-2      	; 0x406 <main+0x4c>
 
-000005b4 <_exit>:
- 5b4:	f8 94       	cli
+00000408 <_exit>:
+ 408:	f8 94       	cli
 
-000005b6 <__stop_program>:
- 5b6:	ff cf       	rjmp	.-2      	; 0x5b6 <__stop_program>
+0000040a <__stop_program>:
+ 40a:	ff cf       	rjmp	.-2      	; 0x40a <__stop_program>

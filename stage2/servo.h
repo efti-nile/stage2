@@ -34,7 +34,8 @@ enum ServoName{
 
 enum ServoAction{
 	Init = 0,
-	EnablePWM
+	EnablePWM,
+	DisablePWM
 };
 
 struct ActiveChann_TypeDef{
@@ -52,5 +53,6 @@ extern struct ActiveChann_TypeDef ActiveChann;
 void Servo(enum ServoName s, enum ServoAction a);
 u8 Servo_ChangeDuty(enum ServoName s, u16 newDuty);
 void PWM_AddChannel(u8 channel);
+void PWM_DeleteChannel(u8 channel);
 void PinOut(u8 channel, u8 out);
 #endif
