@@ -69,8 +69,8 @@
 #define PHL_CLOSED 18690
 #define PHL_OPENED 18200
 
-#define CSO_CLOSED 17900
-#define CSO_OPENED 19700
+#define CSO_CLOSED (20000 - 17900)
+#define CSO_OPENED (20000 - 19700)
 
 
 // Local protoypes

@@ -135,8 +135,8 @@ int main(void)
 	}*/
 	
 	//BUTTONS_INIT; // Init buttons
-	Servo(Fins, EnablePWM);
-	while(1);
+	/*Servo(Fins, EnablePWM);
+	while(1);*/
 	
 	while(1){
 		// CS1
@@ -224,7 +224,7 @@ int main(void)
 			Servo(CanSatHatchOpening, EnablePWM);
 			_delay_ms(1000);
 			Servo(CanSatHatchOpening, DisablePWM);
-			}else if (tmp == 2){
+		}else if (tmp == 2){
 			pwmDutyTab[CanSatHatchOpening] = CSO_OPENED;
 			Servo(CanSatHatchOpening, EnablePWM);
 			_delay_ms(1000);

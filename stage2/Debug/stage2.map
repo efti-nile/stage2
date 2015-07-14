@@ -19,8 +19,6 @@ Discarded input sections
  .text          0x00000000        0x0 stage2.o
  .data          0x00000000        0x0 stage2.o
  .bss           0x00000000        0x0 stage2.o
- .text._Z7pollingPVhh
-                0x00000000      0x1a0 stage2.o
  .data.calvar   0x00000000        0x2 stage2.o
  .text          0x00000000        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
  .data          0x00000000        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
@@ -190,7 +188,7 @@ END GROUP
 .rela.plt
  *(.rela.plt)
 
-.text           0x00000000      0x40c
+.text           0x00000000      0x8a4
  *(.vectors)
  .vectors       0x00000000       0x8c c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/../../../../avr/lib/avr51/crtm128.o
                 0x00000000                __vector_default
@@ -301,13 +299,16 @@ END GROUP
  .text.__vector_14
                 0x00000270      0x14a stage2.o
                 0x00000270                __vector_14
- .text.main     0x000003ba       0x4e stage2.o
-                0x000003ba                main
-                0x00000408                . = ALIGN (0x2)
+ .text._Z7pollingPVhh
+                0x000003ba      0x1a0 stage2.o
+                0x000003ba                _Z7pollingPVhh
+ .text.main     0x0000055a      0x346 stage2.o
+                0x0000055a                main
+                0x000008a0                . = ALIGN (0x2)
  *(.fini9)
- .fini9         0x00000408        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
-                0x00000408                _exit
-                0x00000408                exit
+ .fini9         0x000008a0        0x0 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
+                0x000008a0                _exit
+                0x000008a0                exit
  *(.fini9)
  *(.fini8)
  *(.fini8)
@@ -326,11 +327,11 @@ END GROUP
  *(.fini1)
  *(.fini1)
  *(.fini0)
- .fini0         0x00000408        0x4 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
+ .fini0         0x000008a0        0x4 c:/program files (x86)/atmel/atmel toolchain/avr8 gcc/native/3.4.1061/avr8-gnu-toolchain/bin/../lib/gcc/avr/4.8.1/avr51\libgcc.a(_exit.o)
  *(.fini0)
-                0x0000040c                _etext = .
+                0x000008a4                _etext = .
 
-.data           0x00800100       0x52 load address 0x0000040c
+.data           0x00800100       0x52 load address 0x000008a4
                 0x00800100                PROVIDE (__data_start, .)
  *(.data)
  *(.data*)
@@ -359,8 +360,8 @@ END GROUP
                 0x00800152                pwmCanBeChanged
  *(COMMON)
                 0x00800153                PROVIDE (__bss_end, .)
-                0x0000040c                __data_load_start = LOADADDR (.data)
-                0x0000045e                __data_load_end = (__data_load_start + SIZEOF (.data))
+                0x000008a4                __data_load_start = LOADADDR (.data)
+                0x000008f6                __data_load_end = (__data_load_start + SIZEOF (.data))
 
 .noinit         0x00800153        0x0
                 0x00800153                PROVIDE (__noinit_start, .)
@@ -437,20 +438,20 @@ END GROUP
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000      0x8ea
+.debug_info     0x00000000      0xf7c
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x00000000      0x375 servo.o
- .debug_info    0x00000375      0x575 stage2.o
+ .debug_info    0x00000375      0xc07 stage2.o
 
-.debug_abbrev   0x00000000      0x3f0
+.debug_abbrev   0x00000000      0x40b
  *(.debug_abbrev)
  .debug_abbrev  0x00000000      0x193 servo.o
- .debug_abbrev  0x00000193      0x25d stage2.o
+ .debug_abbrev  0x00000193      0x278 stage2.o
 
-.debug_line     0x00000000      0x551
+.debug_line     0x00000000      0x789
  *(.debug_line .debug_line.* .debug_line_end)
  .debug_line    0x00000000      0x1fb servo.o
- .debug_line    0x000001fb      0x356 stage2.o
+ .debug_line    0x000001fb      0x58e stage2.o
 
 .debug_frame    0x00000000      0x130
  *(.debug_frame)
@@ -464,10 +465,10 @@ END GROUP
  .debug_str     0x000002d4       0xc1 stage2.o
                                 0x332 (size before relaxing)
 
-.debug_loc      0x00000000      0x8da
+.debug_loc      0x00000000      0xd24
  *(.debug_loc)
  .debug_loc     0x00000000      0x278 servo.o
- .debug_loc     0x00000278      0x662 stage2.o
+ .debug_loc     0x00000278      0xaac stage2.o
 
 .debug_macinfo
  *(.debug_macinfo)

@@ -3,29 +3,29 @@ stage2.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .data         00000052  00800100  0000040c  000004a0  2**0
+  0 .data         00000052  00800100  000008a4  00000938  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  1 .text         0000040c  00000000  00000000  00000094  2**1
+  1 .text         000008a4  00000000  00000000  00000094  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .bss          00000001  00800152  00800152  000004f2  2**0
+  2 .bss          00000001  00800152  00800152  0000098a  2**0
                   ALLOC
-  3 .comment      00000030  00000000  00000000  000004f2  2**0
+  3 .comment      00000030  00000000  00000000  0000098a  2**0
                   CONTENTS, READONLY
-  4 .debug_aranges 00000078  00000000  00000000  00000522  2**0
+  4 .debug_aranges 00000078  00000000  00000000  000009ba  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_info   000008ea  00000000  00000000  0000059a  2**0
+  5 .debug_info   00000f7c  00000000  00000000  00000a32  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_abbrev 000003f0  00000000  00000000  00000e84  2**0
+  6 .debug_abbrev 0000040b  00000000  00000000  000019ae  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_line   00000551  00000000  00000000  00001274  2**0
+  7 .debug_line   00000789  00000000  00000000  00001db9  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_frame  00000130  00000000  00000000  000017c8  2**2
+  8 .debug_frame  00000130  00000000  00000000  00002544  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    00000395  00000000  00000000  000018f8  2**0
+  9 .debug_str    00000395  00000000  00000000  00002674  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_loc    000008da  00000000  00000000  00001c8d  2**0
+ 10 .debug_loc    00000d24  00000000  00000000  00002a09  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_ranges 00000058  00000000  00000000  00002567  2**0
+ 11 .debug_ranges 00000058  00000000  00000000  0000372d  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -114,8 +114,8 @@ Disassembly of section .text:
   98:	11 e0       	ldi	r17, 0x01	; 1
   9a:	a0 e0       	ldi	r26, 0x00	; 0
   9c:	b1 e0       	ldi	r27, 0x01	; 1
-  9e:	ec e0       	ldi	r30, 0x0C	; 12
-  a0:	f4 e0       	ldi	r31, 0x04	; 4
+  9e:	e4 ea       	ldi	r30, 0xA4	; 164
+  a0:	f8 e0       	ldi	r31, 0x08	; 8
   a2:	00 e0       	ldi	r16, 0x00	; 0
   a4:	0b bf       	out	0x3b, r16	; 59
   a6:	02 c0       	rjmp	.+4      	; 0xac <__do_copy_data+0x14>
@@ -138,8 +138,8 @@ Disassembly of section .text:
   bc:	a3 35       	cpi	r26, 0x53	; 83
   be:	b2 07       	cpc	r27, r18
   c0:	e1 f7       	brne	.-8      	; 0xba <.do_clear_bss_loop>
-  c2:	7b d1       	rcall	.+758    	; 0x3ba <main>
-  c4:	a1 c1       	rjmp	.+834    	; 0x408 <_exit>
+  c2:	4b d2       	rcall	.+1174   	; 0x55a <main>
+  c4:	ed c3       	rjmp	.+2010   	; 0x8a0 <_exit>
 
 000000c6 <__bad_interrupt>:
   c6:	9c cf       	rjmp	.-200    	; 0x0 <__vectors>
@@ -376,24 +376,33 @@ void Servo(enum ServoName s, enum ServoAction a){
  25a:	08 95       	ret
 
 0000025c <_Z18ATmega8_16bitTimerv>:
-			}
-		}
-		_delay_ms(1);
-	}
-	return 0;
-}
+volatile u16 calvar = SERVO_PWM_PERIOD_US / 2; // This var used for actuators calibration
+volatile u8 pwmCanBeChanged = 0;
+
+void ATmega8_16bitTimer(void)
+{
+	TCNT1 = 0xFFFF - SERVO_PWM_PERIOD_US;
  25c:	8f ed       	ldi	r24, 0xDF	; 223
  25e:	91 eb       	ldi	r25, 0xB1	; 177
  260:	9d bd       	out	0x2d, r25	; 45
  262:	8c bd       	out	0x2c, r24	; 44
+	// Set timer clock to F_CPU / 8
+	TCCR1B = 0x02;
  264:	82 e0       	ldi	r24, 0x02	; 2
  266:	8e bd       	out	0x2e, r24	; 46
+	// Enable Overflow Interrupt
+	TIMSK |= 1 << TOIE1;
  268:	87 b7       	in	r24, 0x37	; 55
  26a:	84 60       	ori	r24, 0x04	; 4
  26c:	87 bf       	out	0x37, r24	; 55
  26e:	08 95       	ret
 
 00000270 <__vector_14>:
+}
+
+// ISR to deal with software PWM
+ISR(TIMER1_OVF_vect)
+{
  270:	1f 92       	push	r1
  272:	0f 92       	push	r0
  274:	0f b6       	in	r0, 0x3f	; 63
@@ -416,19 +425,24 @@ void Servo(enum ServoName s, enum ServoAction a){
  296:	df 93       	push	r29
  298:	ef 93       	push	r30
  29a:	ff 93       	push	r31
+	if( ActiveChann.Num > 0 ){
  29c:	80 91 08 01 	lds	r24, 0x0108
  2a0:	88 23       	and	r24, r24
  2a2:	09 f4       	brne	.+2      	; 0x2a6 <__vector_14+0x36>
  2a4:	70 c0       	rjmp	.+224    	; 0x386 <__vector_14+0x116>
+		if( ActiveChann.State == NUM_SERVO + 1 ){
  2a6:	e0 91 09 01 	lds	r30, 0x0109
  2aa:	e9 30       	cpi	r30, 0x09	; 9
  2ac:	11 f5       	brne	.+68     	; 0x2f2 <__vector_14+0x82>
+				pwmCanBeChanged = 0;
  2ae:	10 92 52 01 	sts	0x0152, r1
+				for( u8 i = 0; i < ActiveChann.Num; ++i ){
  2b2:	88 23       	and	r24, r24
  2b4:	71 f0       	breq	.+28     	; 0x2d2 <__vector_14+0x62>
  2b6:	10 e0       	ldi	r17, 0x00	; 0
  2b8:	c8 e0       	ldi	r28, 0x08	; 8
  2ba:	d1 e0       	ldi	r29, 0x01	; 1
+					PinOut(ActiveChann.Tab[i], HIGH);
  2bc:	e1 2f       	mov	r30, r17
  2be:	f0 e0       	ldi	r31, 0x00	; 0
  2c0:	e0 50       	subi	r30, 0x00	; 0
@@ -436,11 +450,21 @@ void Servo(enum ServoName s, enum ServoAction a){
  2c4:	61 e0       	ldi	r22, 0x01	; 1
  2c6:	80 81       	ld	r24, Z
  2c8:	73 df       	rcall	.-282    	; 0x1b0 <_Z6PinOuthh>
+ISR(TIMER1_OVF_vect)
+{
+	if( ActiveChann.Num > 0 ){
+		if( ActiveChann.State == NUM_SERVO + 1 ){
+				pwmCanBeChanged = 0;
+				for( u8 i = 0; i < ActiveChann.Num; ++i ){
  2ca:	1f 5f       	subi	r17, 0xFF	; 255
  2cc:	88 81       	ld	r24, Y
  2ce:	18 17       	cp	r17, r24
  2d0:	a8 f3       	brcs	.-22     	; 0x2bc <__vector_14+0x4c>
+					PinOut(ActiveChann.Tab[i], HIGH);
+				}
+				ActiveChann.State = 0;
  2d2:	10 92 09 01 	sts	0x0109, r1
+				TCNT1 = 0xFFFF - pwmDutyTab[ActiveChann.Tab[0]];
  2d6:	e0 91 00 01 	lds	r30, 0x0100
  2da:	f0 e0       	ldi	r31, 0x00	; 0
  2dc:	ee 0f       	add	r30, r30
@@ -454,12 +478,16 @@ void Servo(enum ServoName s, enum ServoAction a){
  2ec:	9d bd       	out	0x2d, r25	; 45
  2ee:	8c bd       	out	0x2c, r24	; 44
  2f0:	4e c0       	rjmp	.+156    	; 0x38e <__vector_14+0x11e>
+			}else{
+				PinOut(ActiveChann.Tab[ActiveChann.State], LOW);
  2f2:	f0 e0       	ldi	r31, 0x00	; 0
  2f4:	e0 50       	subi	r30, 0x00	; 0
  2f6:	ff 4f       	sbci	r31, 0xFF	; 255
  2f8:	60 e0       	ldi	r22, 0x00	; 0
  2fa:	80 81       	ld	r24, Z
  2fc:	59 df       	rcall	.-334    	; 0x1b0 <_Z6PinOuthh>
+				
+				if( ActiveChann.State < ActiveChann.Num - 1 ){
  2fe:	80 91 09 01 	lds	r24, 0x0109
  302:	90 e0       	ldi	r25, 0x00	; 0
  304:	20 91 08 01 	lds	r18, 0x0108
@@ -469,6 +497,7 @@ void Servo(enum ServoName s, enum ServoAction a){
  30e:	82 17       	cp	r24, r18
  310:	93 07       	cpc	r25, r19
  312:	fc f4       	brge	.+62     	; 0x352 <__vector_14+0xe2>
+					TCNT1 = 0xFFFF - ( pwmDutyTab[ActiveChann.Tab[ActiveChann.State+1]] - pwmDutyTab[ActiveChann.Tab[ActiveChann.State]] );
  314:	fc 01       	movw	r30, r24
  316:	e0 50       	subi	r30, 0x00	; 0
  318:	ff 4f       	sbci	r31, 0xFF	; 255
@@ -494,12 +523,15 @@ void Servo(enum ServoName s, enum ServoAction a){
  340:	90 95       	com	r25
  342:	9d bd       	out	0x2d, r25	; 45
  344:	8c bd       	out	0x2c, r24	; 44
+					++ActiveChann.State;
  346:	e9 e0       	ldi	r30, 0x09	; 9
  348:	f1 e0       	ldi	r31, 0x01	; 1
  34a:	80 81       	ld	r24, Z
  34c:	8f 5f       	subi	r24, 0xFF	; 255
  34e:	80 83       	st	Z, r24
  350:	1e c0       	rjmp	.+60     	; 0x38e <__vector_14+0x11e>
+					}else{
+					TCNT1 = 0xFFFF - ( SERVO_PWM_PERIOD_US - pwmDutyTab[ActiveChann.Tab[ActiveChann.State]] );
  352:	fc 01       	movw	r30, r24
  354:	e0 50       	subi	r30, 0x00	; 0
  356:	ff 4f       	sbci	r31, 0xFF	; 255
@@ -519,15 +551,23 @@ void Servo(enum ServoName s, enum ServoAction a){
  372:	90 95       	com	r25
  374:	9d bd       	out	0x2d, r25	; 45
  376:	8c bd       	out	0x2c, r24	; 44
+					ActiveChann.State = NUM_SERVO + 1;
  378:	89 e0       	ldi	r24, 0x09	; 9
  37a:	80 93 09 01 	sts	0x0109, r24
+					pwmCanBeChanged = 1;
  37e:	81 e0       	ldi	r24, 0x01	; 1
  380:	80 93 52 01 	sts	0x0152, r24
  384:	04 c0       	rjmp	.+8      	; 0x38e <__vector_14+0x11e>
+				}
+			}
+		}else{
+			TCNT1 = 0xFFFF - SERVO_PWM_PERIOD_US;
  386:	8f ed       	ldi	r24, 0xDF	; 223
  388:	91 eb       	ldi	r25, 0xB1	; 177
  38a:	9d bd       	out	0x2d, r25	; 45
  38c:	8c bd       	out	0x2c, r24	; 44
+		}
+}
  38e:	ff 91       	pop	r31
  390:	ef 91       	pop	r30
  392:	df 91       	pop	r29
@@ -551,73 +591,949 @@ void Servo(enum ServoName s, enum ServoAction a){
  3b6:	1f 90       	pop	r1
  3b8:	18 95       	reti
 
-000003ba <main>:
+000003ba <_Z7pollingPVhh>:
+
+u8 polling(volatile u8 *reg, u8 bitno){
+ 3ba:	ef 92       	push	r14
+ 3bc:	ff 92       	push	r15
+ 3be:	0f 93       	push	r16
+ 3c0:	1f 93       	push	r17
+ 3c2:	cf 93       	push	r28
+ 3c4:	df 93       	push	r29
+ 3c6:	fc 01       	movw	r30, r24
+	u16 cntr = 0, dcntr;
+	while(*reg & 1 << bitno){
+ 3c8:	80 81       	ld	r24, Z
+ 3ca:	90 e0       	ldi	r25, 0x00	; 0
+ 3cc:	06 2e       	mov	r0, r22
+ 3ce:	02 c0       	rjmp	.+4      	; 0x3d4 <_Z7pollingPVhh+0x1a>
+ 3d0:	95 95       	asr	r25
+ 3d2:	87 95       	ror	r24
+ 3d4:	0a 94       	dec	r0
+ 3d6:	e2 f7       	brpl	.-8      	; 0x3d0 <_Z7pollingPVhh+0x16>
+ 3d8:	80 ff       	sbrs	r24, 0
+ 3da:	b3 c0       	rjmp	.+358    	; 0x542 <_Z7pollingPVhh+0x188>
+ 3dc:	81 e0       	ldi	r24, 0x01	; 1
+ 3de:	90 e0       	ldi	r25, 0x00	; 0
+ 3e0:	9c 01       	movw	r18, r24
+ 3e2:	02 c0       	rjmp	.+4      	; 0x3e8 <_Z7pollingPVhh+0x2e>
+ 3e4:	22 0f       	add	r18, r18
+ 3e6:	33 1f       	adc	r19, r19
+ 3e8:	6a 95       	dec	r22
+ 3ea:	e2 f7       	brpl	.-8      	; 0x3e4 <_Z7pollingPVhh+0x2a>
+ 3ec:	b9 01       	movw	r22, r18
+		if(cntr++ > DEBOUNCE_DELAY){
+ 3ee:	21 e0       	ldi	r18, 0x01	; 1
+ 3f0:	30 e0       	ldi	r19, 0x00	; 0
+ 3f2:	d4 ef       	ldi	r29, 0xF4	; 244
+ 3f4:	c1 e0       	ldi	r28, 0x01	; 1
+			// Wait until the button released
+			dcntr = 0;
+			while(dcntr++ < DOUBLECLICK_DELAY){
+				cntr = 0;
+				while(!(*reg & 1 << bitno)){
+					if(cntr++ > DEBOUNCE_DELAY){
+ 3f6:	b1 e0       	ldi	r27, 0x01	; 1
+ 3f8:	a0 e0       	ldi	r26, 0x00	; 0
+		if(cntr++ > DEBOUNCE_DELAY){
+			// Wait until the button released
+			dcntr = 0;
+			while(dcntr++ < DOUBLECLICK_DELAY){
+				cntr = 0;
+				while(!(*reg & 1 << bitno)){
+ 3fa:	00 e0       	ldi	r16, 0x00	; 0
+ 3fc:	10 e0       	ldi	r17, 0x00	; 0
+ 3fe:	92 c0       	rjmp	.+292    	; 0x524 <_Z7pollingPVhh+0x16a>
+}
+
+u8 polling(volatile u8 *reg, u8 bitno){
+	u16 cntr = 0, dcntr;
+	while(*reg & 1 << bitno){
+		if(cntr++ > DEBOUNCE_DELAY){
+ 400:	2b 30       	cpi	r18, 0x0B	; 11
+ 402:	31 05       	cpc	r19, r1
+ 404:	08 f4       	brcc	.+2      	; 0x408 <_Z7pollingPVhh+0x4e>
+ 406:	8c c0       	rjmp	.+280    	; 0x520 <_Z7pollingPVhh+0x166>
+ 408:	4d 2f       	mov	r20, r29
+ 40a:	5c 2f       	mov	r21, r28
+ 40c:	80 c0       	rjmp	.+256    	; 0x50e <_Z7pollingPVhh+0x154>
+			// Wait until the button released
+			dcntr = 0;
+			while(dcntr++ < DOUBLECLICK_DELAY){
+				cntr = 0;
+				while(!(*reg & 1 << bitno)){
+					if(cntr++ > DEBOUNCE_DELAY){
+ 40e:	2f 5f       	subi	r18, 0xFF	; 255
+ 410:	3f 4f       	sbci	r19, 0xFF	; 255
+ 412:	2c 30       	cpi	r18, 0x0C	; 12
+ 414:	31 05       	cpc	r19, r1
+ 416:	09 f0       	breq	.+2      	; 0x41a <_Z7pollingPVhh+0x60>
+ 418:	5f c0       	rjmp	.+190    	; 0x4d8 <_Z7pollingPVhh+0x11e>
+						// Wait for the second click
+						dcntr = 0;
+						while(dcntr++ < DOUBLECLICK_DELAY){
+ 41a:	41 e0       	ldi	r20, 0x01	; 1
+ 41c:	50 e0       	ldi	r21, 0x00	; 0
+							cntr = 0;
+							while(*reg & 1 << bitno){
+								if(cntr++ > DEBOUNCE_DELAY){
+ 41e:	b1 e0       	ldi	r27, 0x01	; 1
+ 420:	a0 e0       	ldi	r26, 0x00	; 0
+									// So the second click happened
+									dcntr = 0;
+									while(dcntr++ < DOUBLECLICK_DELAY){
+										cntr = 0;
+										while(!(*reg & 1 << bitno)){
+											if(cntr++ > DEBOUNCE_DELAY){
+ 422:	0b 2f       	mov	r16, r27
+ 424:	1a 2f       	mov	r17, r26
+ 426:	db 2f       	mov	r29, r27
+ 428:	ca 2f       	mov	r28, r26
+								if(cntr++ > DEBOUNCE_DELAY){
+									// So the second click happened
+									dcntr = 0;
+									while(dcntr++ < DOUBLECLICK_DELAY){
+										cntr = 0;
+										while(!(*reg & 1 << bitno)){
+ 42a:	e1 2c       	mov	r14, r1
+ 42c:	f1 2c       	mov	r15, r1
+ 42e:	4b c0       	rjmp	.+150    	; 0x4c6 <_Z7pollingPVhh+0x10c>
+						// Wait for the second click
+						dcntr = 0;
+						while(dcntr++ < DOUBLECLICK_DELAY){
+							cntr = 0;
+							while(*reg & 1 << bitno){
+								if(cntr++ > DEBOUNCE_DELAY){
+ 430:	2b 30       	cpi	r18, 0x0B	; 11
+ 432:	31 05       	cpc	r19, r1
+ 434:	68 f1       	brcs	.+90     	; 0x490 <_Z7pollingPVhh+0xd6>
+									// So the second click happened
+									dcntr = 0;
+									while(dcntr++ < DOUBLECLICK_DELAY){
+ 436:	40 2f       	mov	r20, r16
+ 438:	51 2f       	mov	r21, r17
+ 43a:	21 c0       	rjmp	.+66     	; 0x47e <_Z7pollingPVhh+0xc4>
+										cntr = 0;
+										while(!(*reg & 1 << bitno)){
+											if(cntr++ > DEBOUNCE_DELAY){
+ 43c:	2f 5f       	subi	r18, 0xFF	; 255
+ 43e:	3f 4f       	sbci	r19, 0xFF	; 255
+ 440:	2c 30       	cpi	r18, 0x0C	; 12
+ 442:	31 05       	cpc	r19, r1
+ 444:	09 f4       	brne	.+2      	; 0x448 <_Z7pollingPVhh+0x8e>
+ 446:	7f c0       	rjmp	.+254    	; 0x546 <_Z7pollingPVhh+0x18c>
+	#else
+		//round up by default
+		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+	#endif
+
+	__builtin_avr_delay_cycles(__ticks_dc);
+ 448:	8f ec       	ldi	r24, 0xCF	; 207
+ 44a:	97 e0       	ldi	r25, 0x07	; 7
+ 44c:	01 97       	sbiw	r24, 0x01	; 1
+ 44e:	f1 f7       	brne	.-4      	; 0x44c <_Z7pollingPVhh+0x92>
+ 450:	00 c0       	rjmp	.+0      	; 0x452 <_Z7pollingPVhh+0x98>
+ 452:	00 00       	nop
+								if(cntr++ > DEBOUNCE_DELAY){
+									// So the second click happened
+									dcntr = 0;
+									while(dcntr++ < DOUBLECLICK_DELAY){
+										cntr = 0;
+										while(!(*reg & 1 << bitno)){
+ 454:	80 81       	ld	r24, Z
+ 456:	90 e0       	ldi	r25, 0x00	; 0
+ 458:	86 23       	and	r24, r22
+ 45a:	97 23       	and	r25, r23
+ 45c:	89 2b       	or	r24, r25
+ 45e:	71 f3       	breq	.-36     	; 0x43c <_Z7pollingPVhh+0x82>
+ 460:	02 c0       	rjmp	.+4      	; 0x466 <_Z7pollingPVhh+0xac>
+ 462:	2e 2d       	mov	r18, r14
+ 464:	3f 2d       	mov	r19, r15
+ 466:	8f ec       	ldi	r24, 0xCF	; 207
+ 468:	97 e0       	ldi	r25, 0x07	; 7
+ 46a:	01 97       	sbiw	r24, 0x01	; 1
+ 46c:	f1 f7       	brne	.-4      	; 0x46a <_Z7pollingPVhh+0xb0>
+ 46e:	00 c0       	rjmp	.+0      	; 0x470 <_Z7pollingPVhh+0xb6>
+ 470:	00 00       	nop
+							cntr = 0;
+							while(*reg & 1 << bitno){
+								if(cntr++ > DEBOUNCE_DELAY){
+									// So the second click happened
+									dcntr = 0;
+									while(dcntr++ < DOUBLECLICK_DELAY){
+ 472:	4f 5f       	subi	r20, 0xFF	; 255
+ 474:	5f 4f       	sbci	r21, 0xFF	; 255
+ 476:	45 3f       	cpi	r20, 0xF5	; 245
+ 478:	91 e0       	ldi	r25, 0x01	; 1
+ 47a:	59 07       	cpc	r21, r25
+ 47c:	59 f0       	breq	.+22     	; 0x494 <_Z7pollingPVhh+0xda>
+										cntr = 0;
+										while(!(*reg & 1 << bitno)){
+ 47e:	80 81       	ld	r24, Z
+ 480:	90 e0       	ldi	r25, 0x00	; 0
+ 482:	86 23       	and	r24, r22
+ 484:	97 23       	and	r25, r23
+ 486:	89 2b       	or	r24, r25
+ 488:	61 f7       	brne	.-40     	; 0x462 <_Z7pollingPVhh+0xa8>
+											if(cntr++ > DEBOUNCE_DELAY){
+ 48a:	2d 2f       	mov	r18, r29
+ 48c:	3c 2f       	mov	r19, r28
+ 48e:	dc cf       	rjmp	.-72     	; 0x448 <_Z7pollingPVhh+0x8e>
+						// Wait for the second click
+						dcntr = 0;
+						while(dcntr++ < DOUBLECLICK_DELAY){
+							cntr = 0;
+							while(*reg & 1 << bitno){
+								if(cntr++ > DEBOUNCE_DELAY){
+ 490:	2f 5f       	subi	r18, 0xFF	; 255
+ 492:	3f 4f       	sbci	r19, 0xFF	; 255
+ 494:	8f ec       	ldi	r24, 0xCF	; 207
+ 496:	97 e0       	ldi	r25, 0x07	; 7
+ 498:	01 97       	sbiw	r24, 0x01	; 1
+ 49a:	f1 f7       	brne	.-4      	; 0x498 <_Z7pollingPVhh+0xde>
+ 49c:	00 c0       	rjmp	.+0      	; 0x49e <_Z7pollingPVhh+0xe4>
+ 49e:	00 00       	nop
+					if(cntr++ > DEBOUNCE_DELAY){
+						// Wait for the second click
+						dcntr = 0;
+						while(dcntr++ < DOUBLECLICK_DELAY){
+							cntr = 0;
+							while(*reg & 1 << bitno){
+ 4a0:	80 81       	ld	r24, Z
+ 4a2:	90 e0       	ldi	r25, 0x00	; 0
+ 4a4:	86 23       	and	r24, r22
+ 4a6:	97 23       	and	r25, r23
+ 4a8:	89 2b       	or	r24, r25
+ 4aa:	11 f6       	brne	.-124    	; 0x430 <_Z7pollingPVhh+0x76>
+ 4ac:	8f ec       	ldi	r24, 0xCF	; 207
+ 4ae:	97 e0       	ldi	r25, 0x07	; 7
+ 4b0:	01 97       	sbiw	r24, 0x01	; 1
+ 4b2:	f1 f7       	brne	.-4      	; 0x4b0 <_Z7pollingPVhh+0xf6>
+ 4b4:	00 c0       	rjmp	.+0      	; 0x4b6 <_Z7pollingPVhh+0xfc>
+ 4b6:	00 00       	nop
+				cntr = 0;
+				while(!(*reg & 1 << bitno)){
+					if(cntr++ > DEBOUNCE_DELAY){
+						// Wait for the second click
+						dcntr = 0;
+						while(dcntr++ < DOUBLECLICK_DELAY){
+ 4b8:	ca 01       	movw	r24, r20
+ 4ba:	01 96       	adiw	r24, 0x01	; 1
+ 4bc:	44 3f       	cpi	r20, 0xF4	; 244
+ 4be:	51 40       	sbci	r21, 0x01	; 1
+ 4c0:	08 f0       	brcs	.+2      	; 0x4c4 <_Z7pollingPVhh+0x10a>
+ 4c2:	43 c0       	rjmp	.+134    	; 0x54a <_Z7pollingPVhh+0x190>
+ 4c4:	ac 01       	movw	r20, r24
+							cntr = 0;
+							while(*reg & 1 << bitno){
+ 4c6:	80 81       	ld	r24, Z
+ 4c8:	90 e0       	ldi	r25, 0x00	; 0
+ 4ca:	86 23       	and	r24, r22
+ 4cc:	97 23       	and	r25, r23
+ 4ce:	89 2b       	or	r24, r25
+ 4d0:	69 f3       	breq	.-38     	; 0x4ac <_Z7pollingPVhh+0xf2>
+								if(cntr++ > DEBOUNCE_DELAY){
+ 4d2:	2b 2f       	mov	r18, r27
+ 4d4:	3a 2f       	mov	r19, r26
+ 4d6:	de cf       	rjmp	.-68     	; 0x494 <_Z7pollingPVhh+0xda>
+ 4d8:	8f ec       	ldi	r24, 0xCF	; 207
+ 4da:	97 e0       	ldi	r25, 0x07	; 7
+ 4dc:	01 97       	sbiw	r24, 0x01	; 1
+ 4de:	f1 f7       	brne	.-4      	; 0x4dc <_Z7pollingPVhh+0x122>
+ 4e0:	00 c0       	rjmp	.+0      	; 0x4e2 <_Z7pollingPVhh+0x128>
+ 4e2:	00 00       	nop
+		if(cntr++ > DEBOUNCE_DELAY){
+			// Wait until the button released
+			dcntr = 0;
+			while(dcntr++ < DOUBLECLICK_DELAY){
+				cntr = 0;
+				while(!(*reg & 1 << bitno)){
+ 4e4:	80 81       	ld	r24, Z
+ 4e6:	90 e0       	ldi	r25, 0x00	; 0
+ 4e8:	86 23       	and	r24, r22
+ 4ea:	97 23       	and	r25, r23
+ 4ec:	89 2b       	or	r24, r25
+ 4ee:	09 f4       	brne	.+2      	; 0x4f2 <_Z7pollingPVhh+0x138>
+ 4f0:	8e cf       	rjmp	.-228    	; 0x40e <_Z7pollingPVhh+0x54>
+ 4f2:	02 c0       	rjmp	.+4      	; 0x4f8 <_Z7pollingPVhh+0x13e>
+ 4f4:	20 2f       	mov	r18, r16
+ 4f6:	31 2f       	mov	r19, r17
+ 4f8:	8f ec       	ldi	r24, 0xCF	; 207
+ 4fa:	97 e0       	ldi	r25, 0x07	; 7
+ 4fc:	01 97       	sbiw	r24, 0x01	; 1
+ 4fe:	f1 f7       	brne	.-4      	; 0x4fc <_Z7pollingPVhh+0x142>
+ 500:	00 c0       	rjmp	.+0      	; 0x502 <_Z7pollingPVhh+0x148>
+ 502:	00 00       	nop
+ 504:	41 50       	subi	r20, 0x01	; 1
+ 506:	51 09       	sbc	r21, r1
+	u16 cntr = 0, dcntr;
+	while(*reg & 1 << bitno){
+		if(cntr++ > DEBOUNCE_DELAY){
+			// Wait until the button released
+			dcntr = 0;
+			while(dcntr++ < DOUBLECLICK_DELAY){
+ 508:	41 15       	cp	r20, r1
+ 50a:	51 05       	cpc	r21, r1
+ 50c:	59 f0       	breq	.+22     	; 0x524 <_Z7pollingPVhh+0x16a>
+				cntr = 0;
+				while(!(*reg & 1 << bitno)){
+ 50e:	80 81       	ld	r24, Z
+ 510:	90 e0       	ldi	r25, 0x00	; 0
+ 512:	86 23       	and	r24, r22
+ 514:	97 23       	and	r25, r23
+ 516:	89 2b       	or	r24, r25
+ 518:	69 f7       	brne	.-38     	; 0x4f4 <_Z7pollingPVhh+0x13a>
+					if(cntr++ > DEBOUNCE_DELAY){
+ 51a:	2b 2f       	mov	r18, r27
+ 51c:	3a 2f       	mov	r19, r26
+ 51e:	dc cf       	rjmp	.-72     	; 0x4d8 <_Z7pollingPVhh+0x11e>
+}
+
+u8 polling(volatile u8 *reg, u8 bitno){
+	u16 cntr = 0, dcntr;
+	while(*reg & 1 << bitno){
+		if(cntr++ > DEBOUNCE_DELAY){
+ 520:	2f 5f       	subi	r18, 0xFF	; 255
+ 522:	3f 4f       	sbci	r19, 0xFF	; 255
+ 524:	8f ec       	ldi	r24, 0xCF	; 207
+ 526:	97 e0       	ldi	r25, 0x07	; 7
+ 528:	01 97       	sbiw	r24, 0x01	; 1
+ 52a:	f1 f7       	brne	.-4      	; 0x528 <_Z7pollingPVhh+0x16e>
+ 52c:	00 c0       	rjmp	.+0      	; 0x52e <_Z7pollingPVhh+0x174>
+ 52e:	00 00       	nop
+		}
+}
+
+u8 polling(volatile u8 *reg, u8 bitno){
+	u16 cntr = 0, dcntr;
+	while(*reg & 1 << bitno){
+ 530:	80 81       	ld	r24, Z
+ 532:	90 e0       	ldi	r25, 0x00	; 0
+ 534:	86 23       	and	r24, r22
+ 536:	97 23       	and	r25, r23
+ 538:	89 2b       	or	r24, r25
+ 53a:	09 f0       	breq	.+2      	; 0x53e <_Z7pollingPVhh+0x184>
+ 53c:	61 cf       	rjmp	.-318    	; 0x400 <_Z7pollingPVhh+0x46>
+				_delay_ms(1);
+			}
+		}
+		_delay_ms(1);
+	}
+	return 0;
+ 53e:	80 e0       	ldi	r24, 0x00	; 0
+ 540:	05 c0       	rjmp	.+10     	; 0x54c <_Z7pollingPVhh+0x192>
+ 542:	80 e0       	ldi	r24, 0x00	; 0
+ 544:	03 c0       	rjmp	.+6      	; 0x54c <_Z7pollingPVhh+0x192>
+									dcntr = 0;
+									while(dcntr++ < DOUBLECLICK_DELAY){
+										cntr = 0;
+										while(!(*reg & 1 << bitno)){
+											if(cntr++ > DEBOUNCE_DELAY){
+												return 2;
+ 546:	82 e0       	ldi	r24, 0x02	; 2
+ 548:	01 c0       	rjmp	.+2      	; 0x54c <_Z7pollingPVhh+0x192>
+								_delay_ms(1);
+							}
+							_delay_ms(1);
+						}
+						// So there was only one click
+						return 1;
+ 54a:	81 e0       	ldi	r24, 0x01	; 1
+			}
+		}
+		_delay_ms(1);
+	}
+	return 0;
+}
+ 54c:	df 91       	pop	r29
+ 54e:	cf 91       	pop	r28
+ 550:	1f 91       	pop	r17
+ 552:	0f 91       	pop	r16
+ 554:	ff 90       	pop	r15
+ 556:	ef 90       	pop	r14
+ 558:	08 95       	ret
+
+0000055a <main>:
 
 int main(void)
 {
 	SP = 0xFFF;
- 3ba:	8f ef       	ldi	r24, 0xFF	; 255
- 3bc:	9f e0       	ldi	r25, 0x0F	; 15
- 3be:	9e bf       	out	0x3e, r25	; 62
- 3c0:	8d bf       	out	0x3d, r24	; 61
+ 55a:	8f ef       	ldi	r24, 0xFF	; 255
+ 55c:	9f e0       	ldi	r25, 0x0F	; 15
+ 55e:	9e bf       	out	0x3e, r25	; 62
+ 560:	8d bf       	out	0x3d, r24	; 61
 	
 	PING &= ~0x07;
- 3c2:	e3 e6       	ldi	r30, 0x63	; 99
- 3c4:	f0 e0       	ldi	r31, 0x00	; 0
- 3c6:	80 81       	ld	r24, Z
- 3c8:	88 7f       	andi	r24, 0xF8	; 248
- 3ca:	80 83       	st	Z, r24
+ 562:	e3 e6       	ldi	r30, 0x63	; 99
+ 564:	f0 e0       	ldi	r31, 0x00	; 0
+ 566:	80 81       	ld	r24, Z
+ 568:	88 7f       	andi	r24, 0xF8	; 248
+ 56a:	80 83       	st	Z, r24
 	
 	Servo(CanSat1, Init);
- 3cc:	60 e0       	ldi	r22, 0x00	; 0
- 3ce:	80 e0       	ldi	r24, 0x00	; 0
- 3d0:	22 df       	rcall	.-444    	; 0x216 <_Z5Servo9ServoName11ServoAction>
+ 56c:	60 e0       	ldi	r22, 0x00	; 0
+ 56e:	80 e0       	ldi	r24, 0x00	; 0
+ 570:	52 de       	rcall	.-860    	; 0x216 <_Z5Servo9ServoName11ServoAction>
 	Servo(CanSat2, Init);
- 3d2:	60 e0       	ldi	r22, 0x00	; 0
- 3d4:	81 e0       	ldi	r24, 0x01	; 1
- 3d6:	1f df       	rcall	.-450    	; 0x216 <_Z5Servo9ServoName11ServoAction>
+ 572:	60 e0       	ldi	r22, 0x00	; 0
+ 574:	81 e0       	ldi	r24, 0x01	; 1
+ 576:	4f de       	rcall	.-866    	; 0x216 <_Z5Servo9ServoName11ServoAction>
 	Servo(CanSat3, Init);
- 3d8:	60 e0       	ldi	r22, 0x00	; 0
- 3da:	82 e0       	ldi	r24, 0x02	; 2
- 3dc:	1c df       	rcall	.-456    	; 0x216 <_Z5Servo9ServoName11ServoAction>
+ 578:	60 e0       	ldi	r22, 0x00	; 0
+ 57a:	82 e0       	ldi	r24, 0x02	; 2
+ 57c:	4c de       	rcall	.-872    	; 0x216 <_Z5Servo9ServoName11ServoAction>
 	Servo(Parachute, Init);
- 3de:	60 e0       	ldi	r22, 0x00	; 0
- 3e0:	83 e0       	ldi	r24, 0x03	; 3
- 3e2:	19 df       	rcall	.-462    	; 0x216 <_Z5Servo9ServoName11ServoAction>
+ 57e:	60 e0       	ldi	r22, 0x00	; 0
+ 580:	83 e0       	ldi	r24, 0x03	; 3
+ 582:	49 de       	rcall	.-878    	; 0x216 <_Z5Servo9ServoName11ServoAction>
 	Servo(CanSatsHatchLock, Init);
- 3e4:	60 e0       	ldi	r22, 0x00	; 0
- 3e6:	84 e0       	ldi	r24, 0x04	; 4
- 3e8:	16 df       	rcall	.-468    	; 0x216 <_Z5Servo9ServoName11ServoAction>
+ 584:	60 e0       	ldi	r22, 0x00	; 0
+ 586:	84 e0       	ldi	r24, 0x04	; 4
+ 588:	46 de       	rcall	.-884    	; 0x216 <_Z5Servo9ServoName11ServoAction>
 	Servo(ParachuteHatchLock, Init);
- 3ea:	60 e0       	ldi	r22, 0x00	; 0
- 3ec:	85 e0       	ldi	r24, 0x05	; 5
- 3ee:	13 df       	rcall	.-474    	; 0x216 <_Z5Servo9ServoName11ServoAction>
+ 58a:	60 e0       	ldi	r22, 0x00	; 0
+ 58c:	85 e0       	ldi	r24, 0x05	; 5
+ 58e:	43 de       	rcall	.-890    	; 0x216 <_Z5Servo9ServoName11ServoAction>
 	Servo(CanSatHatchOpening, Init);
- 3f0:	60 e0       	ldi	r22, 0x00	; 0
- 3f2:	86 e0       	ldi	r24, 0x06	; 6
- 3f4:	10 df       	rcall	.-480    	; 0x216 <_Z5Servo9ServoName11ServoAction>
+ 590:	60 e0       	ldi	r22, 0x00	; 0
+ 592:	86 e0       	ldi	r24, 0x06	; 6
+ 594:	40 de       	rcall	.-896    	; 0x216 <_Z5Servo9ServoName11ServoAction>
 	Servo(Fins, Init);
- 3f6:	60 e0       	ldi	r22, 0x00	; 0
- 3f8:	87 e0       	ldi	r24, 0x07	; 7
- 3fa:	0d df       	rcall	.-486    	; 0x216 <_Z5Servo9ServoName11ServoAction>
+ 596:	60 e0       	ldi	r22, 0x00	; 0
+ 598:	87 e0       	ldi	r24, 0x07	; 7
+ 59a:	3d de       	rcall	.-902    	; 0x216 <_Z5Servo9ServoName11ServoAction>
 	
 	ATmega8_16bitTimer();
- 3fc:	2f df       	rcall	.-418    	; 0x25c <_Z18ATmega8_16bitTimerv>
+ 59c:	5f de       	rcall	.-834    	; 0x25c <_Z18ATmega8_16bitTimerv>
 	sei();
- 3fe:	78 94       	sei
-		pwmDutyTab[acn] = calvar;
-		_delay_ms(10);
-	}*/
+ 59e:	78 94       	sei
+			pwmDutyTab[CanSat1] = CS1_CLOSED;
+			Servo(CanSat1, EnablePWM);
+			_delay_ms(1000);
+			Servo(CanSat1, DisablePWM);
+		}else if (tmp == 2){
+			pwmDutyTab[CanSat1] = CS1_OPENED;
+ 5a0:	0f 2e       	mov	r0, r31
+ 5a2:	fa e0       	ldi	r31, 0x0A	; 10
+ 5a4:	af 2e       	mov	r10, r31
+ 5a6:	f1 e0       	ldi	r31, 0x01	; 1
+ 5a8:	bf 2e       	mov	r11, r31
+ 5aa:	f0 2d       	mov	r31, r0
 	
-	//BUTTONS_INIT; // Init buttons
-	Servo(Fins, EnablePWM);
- 400:	61 e0       	ldi	r22, 0x01	; 1
- 402:	87 e0       	ldi	r24, 0x07	; 7
- 404:	08 df       	rcall	.-496    	; 0x216 <_Z5Servo9ServoName11ServoAction>
- 406:	ff cf       	rjmp	.-2      	; 0x406 <main+0x4c>
+	while(1){
+		// CS1
+		u8 tmp = polling(&PINF, 1);
+		if(tmp == 1){
+			pwmDutyTab[CanSat1] = CS1_CLOSED;
+ 5ac:	0f 2e       	mov	r0, r31
+ 5ae:	f2 e4       	ldi	r31, 0x42	; 66
+ 5b0:	8f 2e       	mov	r8, r31
+ 5b2:	fa e4       	ldi	r31, 0x4A	; 74
+ 5b4:	9f 2e       	mov	r9, r31
+ 5b6:	f0 2d       	mov	r31, r0
+			pwmDutyTab[CanSat2] = CS2_CLOSED;
+			Servo(CanSat2, EnablePWM);
+			_delay_ms(1000);
+			Servo(CanSat2, DisablePWM);
+		}else if (tmp == 2){
+			pwmDutyTab[CanSat2] = CS2_OPENED;
+ 5b8:	0f 2e       	mov	r0, r31
+ 5ba:	fc e0       	ldi	r31, 0x0C	; 12
+ 5bc:	cf 2e       	mov	r12, r31
+ 5be:	f1 e0       	ldi	r31, 0x01	; 1
+ 5c0:	df 2e       	mov	r13, r31
+ 5c2:	f0 2d       	mov	r31, r0
+			Servo(CanSat1, DisablePWM);
+		}
+		// CS2
+		tmp = polling(&PINF, 2);
+		if(tmp == 1){
+			pwmDutyTab[CanSat2] = CS2_CLOSED;
+ 5c4:	0f 2e       	mov	r0, r31
+ 5c6:	fe e2       	ldi	r31, 0x2E	; 46
+ 5c8:	6f 2e       	mov	r6, r31
+ 5ca:	fa e4       	ldi	r31, 0x4A	; 74
+ 5cc:	7f 2e       	mov	r7, r31
+ 5ce:	f0 2d       	mov	r31, r0
+			pwmDutyTab[CanSat3] = CS3_CLOSED;
+			Servo(CanSat3, EnablePWM);
+			_delay_ms(1000);
+			Servo(CanSat3, DisablePWM);
+		}else if (tmp == 2){
+			pwmDutyTab[CanSat3] = CS3_OPENED;
+ 5d0:	0f 2e       	mov	r0, r31
+ 5d2:	fe e0       	ldi	r31, 0x0E	; 14
+ 5d4:	ef 2e       	mov	r14, r31
+ 5d6:	f1 e0       	ldi	r31, 0x01	; 1
+ 5d8:	ff 2e       	mov	r15, r31
+ 5da:	f0 2d       	mov	r31, r0
+			Servo(CanSat2, DisablePWM);
+		}
+		// CS3
+		tmp = polling(&PINF, 3);
+		if(tmp == 1){
+			pwmDutyTab[CanSat3] = CS3_CLOSED;
+ 5dc:	0f 2e       	mov	r0, r31
+ 5de:	f0 e5       	ldi	r31, 0x50	; 80
+ 5e0:	4f 2e       	mov	r4, r31
+ 5e2:	f6 e4       	ldi	r31, 0x46	; 70
+ 5e4:	5f 2e       	mov	r5, r31
+ 5e6:	f0 2d       	mov	r31, r0
+			pwmDutyTab[Parachute] = P_CLOSED;
+			Servo(Parachute, EnablePWM);
+			_delay_ms(1000);
+			Servo(Parachute, DisablePWM);
+		}else if (tmp == 2){
+			pwmDutyTab[Parachute] = P_OPENED;
+ 5e8:	00 e1       	ldi	r16, 0x10	; 16
+ 5ea:	11 e0       	ldi	r17, 0x01	; 1
+			Servo(CanSat3, DisablePWM);
+		}
+		// P
+		tmp = polling(&PINA, 5);
+		if(tmp == 1){
+			pwmDutyTab[Parachute] = P_CLOSED;
+ 5ec:	0f 2e       	mov	r0, r31
+ 5ee:	fc e4       	ldi	r31, 0x4C	; 76
+ 5f0:	2f 2e       	mov	r2, r31
+ 5f2:	fa e4       	ldi	r31, 0x4A	; 74
+ 5f4:	3f 2e       	mov	r3, r31
+ 5f6:	f0 2d       	mov	r31, r0
+				pwmDutyTab[CanSatsHatchLock] = CSHL_CLOSED;
+				Servo(CanSatsHatchLock, EnablePWM);
+				_delay_ms(1000);
+				Servo(CanSatsHatchLock, DisablePWM);
+		}else if (tmp == 2){
+				pwmDutyTab[CanSatsHatchLock] = CSHL_OPENED;
+ 5f8:	c2 e1       	ldi	r28, 0x12	; 18
+ 5fa:	d1 e0       	ldi	r29, 0x01	; 1
+	/*Servo(Fins, EnablePWM);
+	while(1);*/
+	
+	while(1){
+		// CS1
+		u8 tmp = polling(&PINF, 1);
+ 5fc:	61 e0       	ldi	r22, 0x01	; 1
+ 5fe:	80 e2       	ldi	r24, 0x20	; 32
+ 600:	90 e0       	ldi	r25, 0x00	; 0
+ 602:	db de       	rcall	.-586    	; 0x3ba <_Z7pollingPVhh>
+		if(tmp == 1){
+ 604:	81 30       	cpi	r24, 0x01	; 1
+ 606:	99 f4       	brne	.+38     	; 0x62e <main+0xd4>
+			pwmDutyTab[CanSat1] = CS1_CLOSED;
+ 608:	f5 01       	movw	r30, r10
+ 60a:	91 82       	std	Z+1, r9	; 0x01
+ 60c:	80 82       	st	Z, r8
+			Servo(CanSat1, EnablePWM);
+ 60e:	61 e0       	ldi	r22, 0x01	; 1
+ 610:	80 e0       	ldi	r24, 0x00	; 0
+ 612:	01 de       	rcall	.-1022   	; 0x216 <_Z5Servo9ServoName11ServoAction>
+ 614:	ff ef       	ldi	r31, 0xFF	; 255
+ 616:	29 e6       	ldi	r18, 0x69	; 105
+ 618:	88 e1       	ldi	r24, 0x18	; 24
+ 61a:	f1 50       	subi	r31, 0x01	; 1
+ 61c:	20 40       	sbci	r18, 0x00	; 0
+ 61e:	80 40       	sbci	r24, 0x00	; 0
+ 620:	e1 f7       	brne	.-8      	; 0x61a <main+0xc0>
+ 622:	00 c0       	rjmp	.+0      	; 0x624 <main+0xca>
+ 624:	00 00       	nop
+			_delay_ms(1000);
+			Servo(CanSat1, DisablePWM);
+ 626:	62 e0       	ldi	r22, 0x02	; 2
+ 628:	80 e0       	ldi	r24, 0x00	; 0
+ 62a:	f5 dd       	rcall	.-1046   	; 0x216 <_Z5Servo9ServoName11ServoAction>
+ 62c:	16 c0       	rjmp	.+44     	; 0x65a <main+0x100>
+		}else if (tmp == 2){
+ 62e:	82 30       	cpi	r24, 0x02	; 2
+ 630:	a1 f4       	brne	.+40     	; 0x65a <main+0x100>
+			pwmDutyTab[CanSat1] = CS1_OPENED;
+ 632:	8c e0       	ldi	r24, 0x0C	; 12
+ 634:	99 e4       	ldi	r25, 0x49	; 73
+ 636:	f5 01       	movw	r30, r10
+ 638:	91 83       	std	Z+1, r25	; 0x01
+ 63a:	80 83       	st	Z, r24
+			Servo(CanSat1, EnablePWM);
+ 63c:	61 e0       	ldi	r22, 0x01	; 1
+ 63e:	80 e0       	ldi	r24, 0x00	; 0
+ 640:	ea dd       	rcall	.-1068   	; 0x216 <_Z5Servo9ServoName11ServoAction>
+ 642:	9f ef       	ldi	r25, 0xFF	; 255
+ 644:	e9 e6       	ldi	r30, 0x69	; 105
+ 646:	f8 e1       	ldi	r31, 0x18	; 24
+ 648:	91 50       	subi	r25, 0x01	; 1
+ 64a:	e0 40       	sbci	r30, 0x00	; 0
+ 64c:	f0 40       	sbci	r31, 0x00	; 0
+ 64e:	e1 f7       	brne	.-8      	; 0x648 <main+0xee>
+ 650:	00 c0       	rjmp	.+0      	; 0x652 <main+0xf8>
+ 652:	00 00       	nop
+			_delay_ms(1000);
+			Servo(CanSat1, DisablePWM);
+ 654:	62 e0       	ldi	r22, 0x02	; 2
+ 656:	80 e0       	ldi	r24, 0x00	; 0
+ 658:	de dd       	rcall	.-1092   	; 0x216 <_Z5Servo9ServoName11ServoAction>
+		}
+		// CS2
+		tmp = polling(&PINF, 2);
+ 65a:	62 e0       	ldi	r22, 0x02	; 2
+ 65c:	80 e2       	ldi	r24, 0x20	; 32
+ 65e:	90 e0       	ldi	r25, 0x00	; 0
+ 660:	ac de       	rcall	.-680    	; 0x3ba <_Z7pollingPVhh>
+		if(tmp == 1){
+ 662:	81 30       	cpi	r24, 0x01	; 1
+ 664:	91 f4       	brne	.+36     	; 0x68a <main+0x130>
+			pwmDutyTab[CanSat2] = CS2_CLOSED;
+ 666:	f6 01       	movw	r30, r12
+ 668:	71 82       	std	Z+1, r7	; 0x01
+ 66a:	60 82       	st	Z, r6
+			Servo(CanSat2, EnablePWM);
+ 66c:	61 e0       	ldi	r22, 0x01	; 1
+ 66e:	d3 dd       	rcall	.-1114   	; 0x216 <_Z5Servo9ServoName11ServoAction>
+ 670:	ff ef       	ldi	r31, 0xFF	; 255
+ 672:	29 e6       	ldi	r18, 0x69	; 105
+ 674:	88 e1       	ldi	r24, 0x18	; 24
+ 676:	f1 50       	subi	r31, 0x01	; 1
+ 678:	20 40       	sbci	r18, 0x00	; 0
+ 67a:	80 40       	sbci	r24, 0x00	; 0
+ 67c:	e1 f7       	brne	.-8      	; 0x676 <main+0x11c>
+ 67e:	00 c0       	rjmp	.+0      	; 0x680 <main+0x126>
+ 680:	00 00       	nop
+			_delay_ms(1000);
+			Servo(CanSat2, DisablePWM);
+ 682:	62 e0       	ldi	r22, 0x02	; 2
+ 684:	81 e0       	ldi	r24, 0x01	; 1
+ 686:	c7 dd       	rcall	.-1138   	; 0x216 <_Z5Servo9ServoName11ServoAction>
+ 688:	16 c0       	rjmp	.+44     	; 0x6b6 <main+0x15c>
+		}else if (tmp == 2){
+ 68a:	82 30       	cpi	r24, 0x02	; 2
+ 68c:	a1 f4       	brne	.+40     	; 0x6b6 <main+0x15c>
+			pwmDutyTab[CanSat2] = CS2_OPENED;
+ 68e:	8c e7       	ldi	r24, 0x7C	; 124
+ 690:	97 e4       	ldi	r25, 0x47	; 71
+ 692:	f6 01       	movw	r30, r12
+ 694:	91 83       	std	Z+1, r25	; 0x01
+ 696:	80 83       	st	Z, r24
+			Servo(CanSat2, EnablePWM);
+ 698:	61 e0       	ldi	r22, 0x01	; 1
+ 69a:	81 e0       	ldi	r24, 0x01	; 1
+ 69c:	bc dd       	rcall	.-1160   	; 0x216 <_Z5Servo9ServoName11ServoAction>
+ 69e:	9f ef       	ldi	r25, 0xFF	; 255
+ 6a0:	e9 e6       	ldi	r30, 0x69	; 105
+ 6a2:	f8 e1       	ldi	r31, 0x18	; 24
+ 6a4:	91 50       	subi	r25, 0x01	; 1
+ 6a6:	e0 40       	sbci	r30, 0x00	; 0
+ 6a8:	f0 40       	sbci	r31, 0x00	; 0
+ 6aa:	e1 f7       	brne	.-8      	; 0x6a4 <main+0x14a>
+ 6ac:	00 c0       	rjmp	.+0      	; 0x6ae <main+0x154>
+ 6ae:	00 00       	nop
+			_delay_ms(1000);
+			Servo(CanSat2, DisablePWM);
+ 6b0:	62 e0       	ldi	r22, 0x02	; 2
+ 6b2:	81 e0       	ldi	r24, 0x01	; 1
+ 6b4:	b0 dd       	rcall	.-1184   	; 0x216 <_Z5Servo9ServoName11ServoAction>
+		}
+		// CS3
+		tmp = polling(&PINF, 3);
+ 6b6:	63 e0       	ldi	r22, 0x03	; 3
+ 6b8:	80 e2       	ldi	r24, 0x20	; 32
+ 6ba:	90 e0       	ldi	r25, 0x00	; 0
+ 6bc:	7e de       	rcall	.-772    	; 0x3ba <_Z7pollingPVhh>
+		if(tmp == 1){
+ 6be:	81 30       	cpi	r24, 0x01	; 1
+ 6c0:	99 f4       	brne	.+38     	; 0x6e8 <main+0x18e>
+			pwmDutyTab[CanSat3] = CS3_CLOSED;
+ 6c2:	f7 01       	movw	r30, r14
+ 6c4:	51 82       	std	Z+1, r5	; 0x01
+ 6c6:	40 82       	st	Z, r4
+			Servo(CanSat3, EnablePWM);
+ 6c8:	61 e0       	ldi	r22, 0x01	; 1
+ 6ca:	82 e0       	ldi	r24, 0x02	; 2
+ 6cc:	a4 dd       	rcall	.-1208   	; 0x216 <_Z5Servo9ServoName11ServoAction>
+ 6ce:	ff ef       	ldi	r31, 0xFF	; 255
+ 6d0:	29 e6       	ldi	r18, 0x69	; 105
+ 6d2:	88 e1       	ldi	r24, 0x18	; 24
+ 6d4:	f1 50       	subi	r31, 0x01	; 1
+ 6d6:	20 40       	sbci	r18, 0x00	; 0
+ 6d8:	80 40       	sbci	r24, 0x00	; 0
+ 6da:	e1 f7       	brne	.-8      	; 0x6d4 <main+0x17a>
+ 6dc:	00 c0       	rjmp	.+0      	; 0x6de <main+0x184>
+ 6de:	00 00       	nop
+			_delay_ms(1000);
+			Servo(CanSat3, DisablePWM);
+ 6e0:	62 e0       	ldi	r22, 0x02	; 2
+ 6e2:	82 e0       	ldi	r24, 0x02	; 2
+ 6e4:	98 dd       	rcall	.-1232   	; 0x216 <_Z5Servo9ServoName11ServoAction>
+ 6e6:	16 c0       	rjmp	.+44     	; 0x714 <main+0x1ba>
+		}else if (tmp == 2){
+ 6e8:	82 30       	cpi	r24, 0x02	; 2
+ 6ea:	a1 f4       	brne	.+40     	; 0x714 <main+0x1ba>
+			pwmDutyTab[CanSat3] = CS3_OPENED;
+ 6ec:	86 e1       	ldi	r24, 0x16	; 22
+ 6ee:	99 e4       	ldi	r25, 0x49	; 73
+ 6f0:	f7 01       	movw	r30, r14
+ 6f2:	91 83       	std	Z+1, r25	; 0x01
+ 6f4:	80 83       	st	Z, r24
+			Servo(CanSat3, EnablePWM);
+ 6f6:	61 e0       	ldi	r22, 0x01	; 1
+ 6f8:	82 e0       	ldi	r24, 0x02	; 2
+ 6fa:	8d dd       	rcall	.-1254   	; 0x216 <_Z5Servo9ServoName11ServoAction>
+ 6fc:	9f ef       	ldi	r25, 0xFF	; 255
+ 6fe:	e9 e6       	ldi	r30, 0x69	; 105
+ 700:	f8 e1       	ldi	r31, 0x18	; 24
+ 702:	91 50       	subi	r25, 0x01	; 1
+ 704:	e0 40       	sbci	r30, 0x00	; 0
+ 706:	f0 40       	sbci	r31, 0x00	; 0
+ 708:	e1 f7       	brne	.-8      	; 0x702 <main+0x1a8>
+ 70a:	00 c0       	rjmp	.+0      	; 0x70c <main+0x1b2>
+ 70c:	00 00       	nop
+			_delay_ms(1000);
+			Servo(CanSat3, DisablePWM);
+ 70e:	62 e0       	ldi	r22, 0x02	; 2
+ 710:	82 e0       	ldi	r24, 0x02	; 2
+ 712:	81 dd       	rcall	.-1278   	; 0x216 <_Z5Servo9ServoName11ServoAction>
+		}
+		// P
+		tmp = polling(&PINA, 5);
+ 714:	65 e0       	ldi	r22, 0x05	; 5
+ 716:	89 e3       	ldi	r24, 0x39	; 57
+ 718:	90 e0       	ldi	r25, 0x00	; 0
+ 71a:	4f de       	rcall	.-866    	; 0x3ba <_Z7pollingPVhh>
+		if(tmp == 1){
+ 71c:	81 30       	cpi	r24, 0x01	; 1
+ 71e:	99 f4       	brne	.+38     	; 0x746 <main+0x1ec>
+			pwmDutyTab[Parachute] = P_CLOSED;
+ 720:	f8 01       	movw	r30, r16
+ 722:	31 82       	std	Z+1, r3	; 0x01
+ 724:	20 82       	st	Z, r2
+			Servo(Parachute, EnablePWM);
+ 726:	61 e0       	ldi	r22, 0x01	; 1
+ 728:	83 e0       	ldi	r24, 0x03	; 3
+ 72a:	75 dd       	rcall	.-1302   	; 0x216 <_Z5Servo9ServoName11ServoAction>
+ 72c:	ff ef       	ldi	r31, 0xFF	; 255
+ 72e:	29 e6       	ldi	r18, 0x69	; 105
+ 730:	88 e1       	ldi	r24, 0x18	; 24
+ 732:	f1 50       	subi	r31, 0x01	; 1
+ 734:	20 40       	sbci	r18, 0x00	; 0
+ 736:	80 40       	sbci	r24, 0x00	; 0
+ 738:	e1 f7       	brne	.-8      	; 0x732 <main+0x1d8>
+ 73a:	00 c0       	rjmp	.+0      	; 0x73c <main+0x1e2>
+ 73c:	00 00       	nop
+			_delay_ms(1000);
+			Servo(Parachute, DisablePWM);
+ 73e:	62 e0       	ldi	r22, 0x02	; 2
+ 740:	83 e0       	ldi	r24, 0x03	; 3
+ 742:	69 dd       	rcall	.-1326   	; 0x216 <_Z5Servo9ServoName11ServoAction>
+ 744:	16 c0       	rjmp	.+44     	; 0x772 <main+0x218>
+		}else if (tmp == 2){
+ 746:	82 30       	cpi	r24, 0x02	; 2
+ 748:	a1 f4       	brne	.+40     	; 0x772 <main+0x218>
+			pwmDutyTab[Parachute] = P_OPENED;
+ 74a:	8a e5       	ldi	r24, 0x5A	; 90
+ 74c:	96 e4       	ldi	r25, 0x46	; 70
+ 74e:	f8 01       	movw	r30, r16
+ 750:	91 83       	std	Z+1, r25	; 0x01
+ 752:	80 83       	st	Z, r24
+			Servo(Parachute, EnablePWM);
+ 754:	61 e0       	ldi	r22, 0x01	; 1
+ 756:	83 e0       	ldi	r24, 0x03	; 3
+ 758:	5e dd       	rcall	.-1348   	; 0x216 <_Z5Servo9ServoName11ServoAction>
+ 75a:	9f ef       	ldi	r25, 0xFF	; 255
+ 75c:	e9 e6       	ldi	r30, 0x69	; 105
+ 75e:	f8 e1       	ldi	r31, 0x18	; 24
+ 760:	91 50       	subi	r25, 0x01	; 1
+ 762:	e0 40       	sbci	r30, 0x00	; 0
+ 764:	f0 40       	sbci	r31, 0x00	; 0
+ 766:	e1 f7       	brne	.-8      	; 0x760 <main+0x206>
+ 768:	00 c0       	rjmp	.+0      	; 0x76a <main+0x210>
+ 76a:	00 00       	nop
+			_delay_ms(1000);
+			Servo(Parachute, DisablePWM);
+ 76c:	62 e0       	ldi	r22, 0x02	; 2
+ 76e:	83 e0       	ldi	r24, 0x03	; 3
+ 770:	52 dd       	rcall	.-1372   	; 0x216 <_Z5Servo9ServoName11ServoAction>
+		}
+		// CSHL
+		tmp = polling(&PINA, 6);
+ 772:	66 e0       	ldi	r22, 0x06	; 6
+ 774:	89 e3       	ldi	r24, 0x39	; 57
+ 776:	90 e0       	ldi	r25, 0x00	; 0
+ 778:	20 de       	rcall	.-960    	; 0x3ba <_Z7pollingPVhh>
+		if(tmp == 1){
+ 77a:	81 30       	cpi	r24, 0x01	; 1
+ 77c:	a1 f4       	brne	.+40     	; 0x7a6 <main+0x24c>
+				pwmDutyTab[CanSatsHatchLock] = CSHL_CLOSED;
+ 77e:	84 e4       	ldi	r24, 0x44	; 68
+ 780:	98 e4       	ldi	r25, 0x48	; 72
+ 782:	99 83       	std	Y+1, r25	; 0x01
+ 784:	88 83       	st	Y, r24
+				Servo(CanSatsHatchLock, EnablePWM);
+ 786:	61 e0       	ldi	r22, 0x01	; 1
+ 788:	84 e0       	ldi	r24, 0x04	; 4
+ 78a:	45 dd       	rcall	.-1398   	; 0x216 <_Z5Servo9ServoName11ServoAction>
+ 78c:	2f ef       	ldi	r18, 0xFF	; 255
+ 78e:	89 e6       	ldi	r24, 0x69	; 105
+ 790:	98 e1       	ldi	r25, 0x18	; 24
+ 792:	21 50       	subi	r18, 0x01	; 1
+ 794:	80 40       	sbci	r24, 0x00	; 0
+ 796:	90 40       	sbci	r25, 0x00	; 0
+ 798:	e1 f7       	brne	.-8      	; 0x792 <main+0x238>
+ 79a:	00 c0       	rjmp	.+0      	; 0x79c <main+0x242>
+ 79c:	00 00       	nop
+				_delay_ms(1000);
+				Servo(CanSatsHatchLock, DisablePWM);
+ 79e:	62 e0       	ldi	r22, 0x02	; 2
+ 7a0:	84 e0       	ldi	r24, 0x04	; 4
+ 7a2:	39 dd       	rcall	.-1422   	; 0x216 <_Z5Servo9ServoName11ServoAction>
+ 7a4:	15 c0       	rjmp	.+42     	; 0x7d0 <main+0x276>
+		}else if (tmp == 2){
+ 7a6:	82 30       	cpi	r24, 0x02	; 2
+ 7a8:	99 f4       	brne	.+38     	; 0x7d0 <main+0x276>
+				pwmDutyTab[CanSatsHatchLock] = CSHL_OPENED;
+ 7aa:	84 e6       	ldi	r24, 0x64	; 100
+ 7ac:	9b e4       	ldi	r25, 0x4B	; 75
+ 7ae:	99 83       	std	Y+1, r25	; 0x01
+ 7b0:	88 83       	st	Y, r24
+				Servo(CanSatsHatchLock, EnablePWM);
+ 7b2:	61 e0       	ldi	r22, 0x01	; 1
+ 7b4:	84 e0       	ldi	r24, 0x04	; 4
+ 7b6:	2f dd       	rcall	.-1442   	; 0x216 <_Z5Servo9ServoName11ServoAction>
+ 7b8:	ef ef       	ldi	r30, 0xFF	; 255
+ 7ba:	f9 e6       	ldi	r31, 0x69	; 105
+ 7bc:	28 e1       	ldi	r18, 0x18	; 24
+ 7be:	e1 50       	subi	r30, 0x01	; 1
+ 7c0:	f0 40       	sbci	r31, 0x00	; 0
+ 7c2:	20 40       	sbci	r18, 0x00	; 0
+ 7c4:	e1 f7       	brne	.-8      	; 0x7be <main+0x264>
+ 7c6:	00 c0       	rjmp	.+0      	; 0x7c8 <main+0x26e>
+ 7c8:	00 00       	nop
+				_delay_ms(1000);
+				Servo(CanSatsHatchLock, DisablePWM);
+ 7ca:	62 e0       	ldi	r22, 0x02	; 2
+ 7cc:	84 e0       	ldi	r24, 0x04	; 4
+ 7ce:	23 dd       	rcall	.-1466   	; 0x216 <_Z5Servo9ServoName11ServoAction>
+		}
+		// PHL
+		tmp = polling(&PIND, 1);
+ 7d0:	61 e0       	ldi	r22, 0x01	; 1
+ 7d2:	80 e3       	ldi	r24, 0x30	; 48
+ 7d4:	90 e0       	ldi	r25, 0x00	; 0
+ 7d6:	f1 dd       	rcall	.-1054   	; 0x3ba <_Z7pollingPVhh>
+		if(tmp == 1){
+ 7d8:	81 30       	cpi	r24, 0x01	; 1
+ 7da:	b1 f4       	brne	.+44     	; 0x808 <main+0x2ae>
+			pwmDutyTab[ParachuteHatchLock] = PHL_CLOSED;
+ 7dc:	82 e0       	ldi	r24, 0x02	; 2
+ 7de:	99 e4       	ldi	r25, 0x49	; 73
+ 7e0:	90 93 15 01 	sts	0x0115, r25
+ 7e4:	80 93 14 01 	sts	0x0114, r24
+			Servo(ParachuteHatchLock, EnablePWM);
+ 7e8:	61 e0       	ldi	r22, 0x01	; 1
+ 7ea:	85 e0       	ldi	r24, 0x05	; 5
+ 7ec:	14 dd       	rcall	.-1496   	; 0x216 <_Z5Servo9ServoName11ServoAction>
+ 7ee:	8f ef       	ldi	r24, 0xFF	; 255
+ 7f0:	99 e6       	ldi	r25, 0x69	; 105
+ 7f2:	e8 e1       	ldi	r30, 0x18	; 24
+ 7f4:	81 50       	subi	r24, 0x01	; 1
+ 7f6:	90 40       	sbci	r25, 0x00	; 0
+ 7f8:	e0 40       	sbci	r30, 0x00	; 0
+ 7fa:	e1 f7       	brne	.-8      	; 0x7f4 <main+0x29a>
+ 7fc:	00 c0       	rjmp	.+0      	; 0x7fe <main+0x2a4>
+ 7fe:	00 00       	nop
+			_delay_ms(1000);
+			Servo(ParachuteHatchLock, DisablePWM);
+ 800:	62 e0       	ldi	r22, 0x02	; 2
+ 802:	85 e0       	ldi	r24, 0x05	; 5
+ 804:	08 dd       	rcall	.-1520   	; 0x216 <_Z5Servo9ServoName11ServoAction>
+ 806:	17 c0       	rjmp	.+46     	; 0x836 <main+0x2dc>
+			}else if (tmp == 2){
+ 808:	82 30       	cpi	r24, 0x02	; 2
+ 80a:	a9 f4       	brne	.+42     	; 0x836 <main+0x2dc>
+			pwmDutyTab[ParachuteHatchLock] = PHL_OPENED;
+ 80c:	88 e1       	ldi	r24, 0x18	; 24
+ 80e:	97 e4       	ldi	r25, 0x47	; 71
+ 810:	90 93 15 01 	sts	0x0115, r25
+ 814:	80 93 14 01 	sts	0x0114, r24
+			Servo(ParachuteHatchLock, EnablePWM);
+ 818:	61 e0       	ldi	r22, 0x01	; 1
+ 81a:	85 e0       	ldi	r24, 0x05	; 5
+ 81c:	fc dc       	rcall	.-1544   	; 0x216 <_Z5Servo9ServoName11ServoAction>
+ 81e:	ff ef       	ldi	r31, 0xFF	; 255
+ 820:	29 e6       	ldi	r18, 0x69	; 105
+ 822:	88 e1       	ldi	r24, 0x18	; 24
+ 824:	f1 50       	subi	r31, 0x01	; 1
+ 826:	20 40       	sbci	r18, 0x00	; 0
+ 828:	80 40       	sbci	r24, 0x00	; 0
+ 82a:	e1 f7       	brne	.-8      	; 0x824 <main+0x2ca>
+ 82c:	00 c0       	rjmp	.+0      	; 0x82e <main+0x2d4>
+ 82e:	00 00       	nop
+			_delay_ms(1000);
+			Servo(ParachuteHatchLock, DisablePWM);
+ 830:	62 e0       	ldi	r22, 0x02	; 2
+ 832:	85 e0       	ldi	r24, 0x05	; 5
+ 834:	f0 dc       	rcall	.-1568   	; 0x216 <_Z5Servo9ServoName11ServoAction>
+		}
+		// CHO
+		tmp = polling(&PIND, 3);
+ 836:	63 e0       	ldi	r22, 0x03	; 3
+ 838:	80 e3       	ldi	r24, 0x30	; 48
+ 83a:	90 e0       	ldi	r25, 0x00	; 0
+ 83c:	be dd       	rcall	.-1156   	; 0x3ba <_Z7pollingPVhh>
+		if(tmp == 1){
+ 83e:	81 30       	cpi	r24, 0x01	; 1
+ 840:	b1 f4       	brne	.+44     	; 0x86e <main+0x314>
+			pwmDutyTab[CanSatHatchOpening] = CSO_CLOSED;
+ 842:	84 e3       	ldi	r24, 0x34	; 52
+ 844:	98 e0       	ldi	r25, 0x08	; 8
+ 846:	90 93 17 01 	sts	0x0117, r25
+ 84a:	80 93 16 01 	sts	0x0116, r24
+			Servo(CanSatHatchOpening, EnablePWM);
+ 84e:	61 e0       	ldi	r22, 0x01	; 1
+ 850:	86 e0       	ldi	r24, 0x06	; 6
+ 852:	e1 dc       	rcall	.-1598   	; 0x216 <_Z5Servo9ServoName11ServoAction>
+ 854:	9f ef       	ldi	r25, 0xFF	; 255
+ 856:	e9 e6       	ldi	r30, 0x69	; 105
+ 858:	f8 e1       	ldi	r31, 0x18	; 24
+ 85a:	91 50       	subi	r25, 0x01	; 1
+ 85c:	e0 40       	sbci	r30, 0x00	; 0
+ 85e:	f0 40       	sbci	r31, 0x00	; 0
+ 860:	e1 f7       	brne	.-8      	; 0x85a <main+0x300>
+ 862:	00 c0       	rjmp	.+0      	; 0x864 <main+0x30a>
+ 864:	00 00       	nop
+			_delay_ms(1000);
+			Servo(CanSatHatchOpening, DisablePWM);
+ 866:	62 e0       	ldi	r22, 0x02	; 2
+ 868:	86 e0       	ldi	r24, 0x06	; 6
+ 86a:	d5 dc       	rcall	.-1622   	; 0x216 <_Z5Servo9ServoName11ServoAction>
+ 86c:	c7 ce       	rjmp	.-626    	; 0x5fc <main+0xa2>
+		}else if (tmp == 2){
+ 86e:	82 30       	cpi	r24, 0x02	; 2
+ 870:	09 f0       	breq	.+2      	; 0x874 <main+0x31a>
+ 872:	c4 ce       	rjmp	.-632    	; 0x5fc <main+0xa2>
+			pwmDutyTab[CanSatHatchOpening] = CSO_OPENED;
+ 874:	8c e2       	ldi	r24, 0x2C	; 44
+ 876:	91 e0       	ldi	r25, 0x01	; 1
+ 878:	90 93 17 01 	sts	0x0117, r25
+ 87c:	80 93 16 01 	sts	0x0116, r24
+			Servo(CanSatHatchOpening, EnablePWM);
+ 880:	61 e0       	ldi	r22, 0x01	; 1
+ 882:	86 e0       	ldi	r24, 0x06	; 6
+ 884:	c8 dc       	rcall	.-1648   	; 0x216 <_Z5Servo9ServoName11ServoAction>
+ 886:	2f ef       	ldi	r18, 0xFF	; 255
+ 888:	89 e6       	ldi	r24, 0x69	; 105
+ 88a:	98 e1       	ldi	r25, 0x18	; 24
+ 88c:	21 50       	subi	r18, 0x01	; 1
+ 88e:	80 40       	sbci	r24, 0x00	; 0
+ 890:	90 40       	sbci	r25, 0x00	; 0
+ 892:	e1 f7       	brne	.-8      	; 0x88c <main+0x332>
+ 894:	00 c0       	rjmp	.+0      	; 0x896 <main+0x33c>
+ 896:	00 00       	nop
+			_delay_ms(1000);
+			Servo(CanSatHatchOpening, DisablePWM);
+ 898:	62 e0       	ldi	r22, 0x02	; 2
+ 89a:	86 e0       	ldi	r24, 0x06	; 6
+ 89c:	bc dc       	rcall	.-1672   	; 0x216 <_Z5Servo9ServoName11ServoAction>
+ 89e:	ae ce       	rjmp	.-676    	; 0x5fc <main+0xa2>
 
-00000408 <_exit>:
- 408:	f8 94       	cli
+000008a0 <_exit>:
+ 8a0:	f8 94       	cli
 
-0000040a <__stop_program>:
- 40a:	ff cf       	rjmp	.-2      	; 0x40a <__stop_program>
+000008a2 <__stop_program>:
+ 8a2:	ff cf       	rjmp	.-2      	; 0x8a2 <__stop_program>
